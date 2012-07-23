@@ -1163,6 +1163,7 @@ ED.Drawing.prototype.showTooltip = function(_point)
 		// Adjust coodinates of tooltip
 		this.canvasTooltip.style.left = xAbs + "px";
 		this.canvasTooltip.style.top = (yAbs + 18) + "px";
+		this.canvasTooltip.style['z-index'] = 999;
 		
 		// Set flag to indicate success
 	var found = false;
