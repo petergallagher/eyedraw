@@ -50,34 +50,32 @@
 	<div class="eyedrawFields">
 		<div>
 			<div class="label">
-				<?php echo $model->getAttributeLabel('gonio_'.$side); ?>
+				<?php echo $model->getAttributeLabel($side.'_gonio_id'); ?>
 				:
 			</div>
 			<div class="data">
-				<?php echo CHtml::activeDropDownList($model, 'gonio_'.$side, $model->getGonioscopyOptions())?>
+				<?php echo CHtml::activeDropDownList($model, $side.'_gonio_id', $model->getGonioscopyOptions())?>
 			</div>
 		</div>
 		<div>
 			<div class="label">
-				<?php echo $model->getAttributeLabel('van_herick_'.$side); ?>
+				<?php echo $model->getAttributeLabel($side.'_van_herick_id'); ?>
 				:
 			</div>
 			<div class="data">
-				<?php echo CHtml::activeDropDownList($model, 'van_herick_'.$side, $model->getVanHerickOptions())?>
+				<?php echo CHtml::activeDropDownList($model, $side.'_van_herick_id', $model->getVanHerickOptions())?>
 			</div>
 		</div>
 		<div>
 			<div class="label">
-				<?php echo $model->getAttributeLabel('description_'.$side); ?>
+				<?php echo $model->getAttributeLabel($side.'_description'); ?>
 				:
 			</div>
 			<div class="data">
-				<?php echo CHtml::activeTextArea($model, 'description_'.$side, array('rows' => "2", 'cols' => "20", 'class' => 'autosize')) ?>
+				<?php echo CHtml::activeTextArea($model, $side.'_description', array('rows' => "2", 'cols' => "20", 'class' => 'autosize')) ?>
 			</div>
 		</div>
-		<div>
-			TODO: Foster images
-		</div>
+		<div>TODO: Foster images</div>
 		<button class="ed_report">Report</button>
 		<button class="ed_clear">Clear</button>
 	</div>
@@ -85,7 +83,26 @@
 	<div class="eyedrawFields view">
 		<div>
 			<div class="data">
-				<?php echo $side == 'right' ? $model->description_right : $model->description_left ?>
+				<?php echo $model->{$side.'_description'} ?>
+			</div>
+		</div>
+		<div>
+			<div class="data">
+				<?php echo $model->getAttributeLabel($side.'_gonio_id') ?>
+				:
+				<?php if($gonio = $model->{$side.'_gonio'}) { 
+					echo $gonio->name;
+} ?>
+			</div>
+		</div>
+		<div>
+			<div class="data">
+				<?php echo $model->getAttributeLabel($side.'_van_herick_id') ?>
+				:
+				<?php if($van_herick = $model->{$side.'_van_herick'}) { 
+					echo $van_herick->name;
+				} else { echo 'NR';
+} ?>
 			</div>
 		</div>
 	</div>

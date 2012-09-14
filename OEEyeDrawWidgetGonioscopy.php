@@ -42,11 +42,13 @@ class OEEyeDrawWidgetGonioscopy extends OEEyeDrawWidget {
 	public $no_wrapper = true;
 	
 	public function init() {
+		$this->onLoadedParamsArray = array();
+		
 		if ($this->mode == 'view') {
 			$this->doodleToolBarArray = array();
-			$this->onLoadedCommandArray = array(array('addDoodle',
-					array('Gonioscopy')), array('deselectDoodles', array()));
+			$this->onLoadedCommandArray = array();
 		}
+		
 		parent::init();
 	}
 
