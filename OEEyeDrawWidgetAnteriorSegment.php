@@ -35,7 +35,7 @@ class OEEyeDrawWidgetAnteriorSegment extends OEEyeDrawWidget {
 		array('deselectDoodles', array()),
 	);
 
-	public $identifier = 'PosteriorSegment';
+	public $identifier = 'AnteriorSegment';
 	public $no_wrapper = true;
 
 	public function init() {
