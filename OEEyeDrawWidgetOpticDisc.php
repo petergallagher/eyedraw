@@ -27,7 +27,6 @@
 require_once(dirname(__FILE__) . "/OEEyeDrawWidget.php");
 
 class OEEyeDrawWidgetOpticDisc extends OEEyeDrawWidget {
-
 	public $doodleToolBarArray = array('DiscHaemorrhage', 'NerveFibreDefect', 'Papilloedema', 'OpticDiscPit');
 	public $size = 300;
 
@@ -45,10 +44,7 @@ class OEEyeDrawWidgetOpticDisc extends OEEyeDrawWidget {
 
 		if ($this->mode == 'view') {
 			$this->doodleToolBarArray = array();
-			$this->onLoadedCommandArray = array(
-					array('addDoodle', array('OpticDisc')),
-					array('deselectDoodles', array()),
-			);
+			$this->onLoadedCommandArray = array();
 		}
 
 		parent::init();

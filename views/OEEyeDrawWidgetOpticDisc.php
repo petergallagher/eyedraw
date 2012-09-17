@@ -69,7 +69,7 @@
 		<button class="ed_report">Report</button>
 		<button class="ed_clear">Clear</button>
 	</div>
-	<?php }else{?>
+	<?php } else { ?>
 	<div class="eyedrawFields view">
 		<div>
 			<div class="data">

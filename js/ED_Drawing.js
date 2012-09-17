@@ -3135,9 +3135,9 @@ ED.Doodle.prototype.json = function()
     {
         s = s + this.squiggleArray[j].json() + ', ';
     }
+    s = s.replace(/,\s$/,'');
     s = s + ']';
     s = s + '}';
-    
     return s;
 }
 
@@ -3665,6 +3665,7 @@ ED.Squiggle.prototype.json = function()
 	{
         s = s + this.pointsArray[i].json() + ', ';
     }
+    s = s.replace(/,\s$/,'');
     s = s + ']';
     s = s + '}';
     
