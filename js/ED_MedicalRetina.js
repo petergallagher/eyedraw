@@ -29,7 +29,7 @@
 if (ED == null || typeof(ED) != "object") { var ED = new Object();}
 
 /**
- * PostPole template with disk and arcades
+ * PostPole template with disc and arcades
  *
  * @class PostPole
  * @property {String} className Name of doodle subclass
@@ -145,7 +145,7 @@ ED.PostPole.prototype.draw = function(_point)
 		var foveaX = -300;
     }
 	
-    // Optic disk and cup
+    // Optic disc and cup
 	var ro = 84;
     var ri = -this.apexY;
 	
@@ -216,7 +216,7 @@ ED.PostPole.prototype.draw = function(_point)
  */
 ED.PostPole.prototype.description = function()
 {
-	return "Cup-disk ratio of " + this.getParameter('cdRatio');
+	return "Cup-disc ratio of " + this.getParameter('cdRatio');
 }
 
 /**
@@ -780,7 +780,7 @@ ED.CNV.prototype.description = function()
 }
 
 /**
- * VitreousOpacity template with disk and arcades
+ * VitreousOpacity template with disc and arcades
  *
  * @class VitreousOpacity
  * @property {String} className Name of doodle subclass
@@ -912,7 +912,7 @@ ED.VitreousOpacity.prototype.description = function()
 }
 
 /**
- * DiabeticNV template with disk and arcades
+ * DiabeticNV template with disc and arcades
  *
  * @class DiabeticNV
  * @property {String} className Name of doodle subclass
@@ -1083,7 +1083,7 @@ ED.DiabeticNV.prototype.description = function()
     {
         if (this.originX > 180 && this.originX < 420 && this.originY > -120 && this.originY < 120)
         {
-            locationString = "at the disk";
+            locationString = "at the disc";
         }
         else
         {
@@ -1096,7 +1096,7 @@ ED.DiabeticNV.prototype.description = function()
     {
         if (this.originX < -180 && this.originX > -420 && this.originY > -120 && this.originY < 120)
         {
-            locationString = "at the disk";
+            locationString = "at the disc";
         }
         else
         {
