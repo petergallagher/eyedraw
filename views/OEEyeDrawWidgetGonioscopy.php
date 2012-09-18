@@ -97,12 +97,12 @@
 				} ?>
 			</div>
 		</div>
-		<?php if($van_herick = $model->{$side.'_van_herick'} || $model->getSetting('expert')) { ?>
+		<?php if($model->{$side.'_van_herick_id'} || $model->getSetting('expert')) { ?>
 		<div>
 			<div class="data">
 				<?php echo $model->getAttributeLabel($side.'_van_herick_id') ?>
 				:
-				<?php if($van_herick) { 
+				<?php if($van_herick = $model->{$side.'_van_herick'}) { 
 					echo $van_herick->name;
 				} else {
 					echo 'NR';
