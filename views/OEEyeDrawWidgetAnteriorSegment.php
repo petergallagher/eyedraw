@@ -50,15 +50,6 @@
 	<div class="eyedrawFields">
 		<div>
 			<div class="label">
-				<?php echo $model->getAttributeLabel($side.'_diagnosis_id'); ?>
-				:
-			</div>
-			<div class="data">
-				<?php echo CHtml::activeDropDownList($model, $side.'_diagnosis_id', $model->getDiagnosisOptions())?>
-			</div>
-		</div>
-		<div>
-			<div class="label">
 				<?php echo $model->getAttributeLabel($side.'_description'); ?>
 				:
 			</div>
@@ -74,17 +65,6 @@
 		<div>
 			<div class="data">
 				<?php echo $model->{$side.'_description'} ?>
-			</div>
-		</div>
-		<div>
-			<div class="data">
-				<?php echo $model->getAttributeLabel($side.'_diagnosis_id') ?>
-				:
-				<?php if($diagnosis = $model->{$side.'_diagnosis'}) {
-					echo $diagnosis->term;
-				} else {
-					echo 'None';
-				}?>
 			</div>
 		</div>
 	</div>

@@ -57,6 +57,7 @@
 				<?php echo CHtml::activeDropDownList($model, $side.'_gonio_id', $model->getGonioscopyOptions())?>
 			</div>
 		</div>
+		<?php if($model->getSetting('expert')) { ?>
 		<div>
 			<div class="label">
 				<?php echo $model->getAttributeLabel($side.'_van_herick_id'); ?>
@@ -66,6 +67,7 @@
 				<?php echo CHtml::activeDropDownList($model, $side.'_van_herick_id', $model->getVanHerickOptions())?>
 			</div>
 		</div>
+		<?php } ?>
 		<div>
 			<div class="label">
 				<?php echo $model->getAttributeLabel($side.'_description'); ?>
@@ -92,19 +94,22 @@
 				:
 				<?php if($gonio = $model->{$side.'_gonio'}) { 
 					echo $gonio->name;
-} ?>
+				} ?>
 			</div>
 		</div>
+		<?php if($van_herick = $model->{$side.'_van_herick'} || $model->getSetting('expert')) { ?>
 		<div>
 			<div class="data">
 				<?php echo $model->getAttributeLabel($side.'_van_herick_id') ?>
 				:
-				<?php if($van_herick = $model->{$side.'_van_herick'}) { 
+				<?php if($van_herick) { 
 					echo $van_herick->name;
-				} else { echo 'NR';
-} ?>
+				} else {
+					echo 'NR';
+				} ?>
 			</div>
 		</div>
+		<?php } ?>
 	</div>
 	<?php }?>
 </div>
