@@ -27,7 +27,7 @@
 require_once(dirname(__FILE__)."/OEEyeDrawWidget.php");
 
 class OEEyeDrawWidgetAnteriorSegment extends OEEyeDrawWidget {
-	public $doodleToolBarArray = array('NuclearCataract', 'CorticalCataract', 'PostSubcapCataract', 'PCIOL', 'ACIOL', 'Bleb', 'PI', 'Fuchs', 'RK', 'LasikFlap', 'CornealScar');
+	public $doodleToolBarArray = array('NuclearCataract','CorticalCataract','PostSubcapCataract','PCIOL','ACIOL','Bleb','PI','Fuchs','RK','LasikFlap','CornealScar');
 	public $size = 300;
 
 	public $onLoadedCommandArray = array(
@@ -39,6 +39,11 @@ class OEEyeDrawWidgetAnteriorSegment extends OEEyeDrawWidget {
 	public $no_wrapper = true;
 
 	public function init() {
+		$side = ($this->side == 'R') ? 'right' : 'left'; 
+		$this->onLoadedParamsArray = array(
+			array('AntSeg', 'pxe', (bool) $this->model->{$side.'_pxe'}),
+		);
+
 		if ($this->mode == 'view') {
 			$this->doodleToolBarArray = array();
 			$this->onLoadedCommandArray = array();
