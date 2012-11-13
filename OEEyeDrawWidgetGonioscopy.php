@@ -28,7 +28,7 @@ require_once(dirname(__FILE__) . "/OEEyeDrawWidget.php");
 
 class OEEyeDrawWidgetGonioscopy extends OEEyeDrawWidget {
 
-	public $doodleToolBarArray = array('AngleNV', 'AntSynech', 'AngleRecession');
+	public $doodleToolBarArray = array('AngleNV');
 
 	public $onLoadedCommandArray = array(
 			array('addDoodle', array('Gonioscopy')),
@@ -43,6 +43,10 @@ class OEEyeDrawWidgetGonioscopy extends OEEyeDrawWidget {
 	
 	public function init() {
 		$this->onLoadedParamsArray = array();
+		
+		if($this->model->getSetting('expert')) {
+			$this->doodleToolBarArray = array('AngleNV', 'AntSynech', 'AngleRecession');
+		}
 		
 		if ($this->mode == 'view') {
 			$this->doodleToolBarArray = array();

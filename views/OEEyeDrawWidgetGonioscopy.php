@@ -7,22 +7,22 @@
 	<?php if ($isEditable && $toolbar) {?>
 	<div style="float: left">
 		<div class="ed_toolbar">
-			<button class="ed_img_button" disabled=true
+			<button class="ed_img_button" disabled='disabled'
 				id="moveToFront<?php echo $idSuffix?>" title="Move to front"
 				onclick="<?php echo $drawingName?>.moveToFront(); return false;">
 				<img src="<?php echo $imgPath?>moveToFront.gif" />
 			</button>
-			<button class="ed_img_button" disabled=true
+			<button class="ed_img_button" disabled='disabled'
 				id="moveToBack<?php echo $idSuffix?>" title="Move to back"
 				onclick="<?php echo $drawingName?>.moveToBack(); return false;">
 				<img src="<?php echo $imgPath?>moveToBack.gif" />
 			</button>
-			<button class="ed_img_button" disabled=true
+			<button class="ed_img_button" disabled='disabled'
 				id="deleteDoodle<?php echo $idSuffix?>" title="Delete"
 				onclick="<?php echo $drawingName?>.deleteDoodle(); return false;">
 				<img src="<?php echo $imgPath?>deleteDoodle.gif" />
 			</button>
-			<button class="ed_img_button" disabled=true
+			<button class="ed_img_button" disabled='disabled'
 				id="lock<?php echo $idSuffix?>" title="Lock"
 				onclick="<?php echo $drawingName?>.lock(); return false;">
 				<img src="<?php echo $imgPath?>lock.gif" />
@@ -48,13 +48,18 @@
 	<canvas id="<?php echo $canvasId?>" class="<?php if ($isEditable) { echo 'edit'; } else { echo 'display'; }?>" width="<?php echo $size?>" height="<?php echo $size?>" tabindex="1"<?php if ($canvasStyle) {?> style="<?php echo $canvasStyle?>"<?php }?>></canvas>
 	<?php if ($isEditable) {?>
 	<div class="eyedrawFields">
-		<div>
-			<div class="label">
-				<?php echo $model->getAttributeLabel($side.'_gonio_id'); ?>
-				:
+		<div<?php if(!$model->getSetting('expert')) { ?> style="display: none;"<?php } ?>>
+			<div class="data">
+				<?php echo CHtml::activeDropDownList($model, $side.'_gonio_sup_id', $model->getGonioscopyOptions(), array('class' => 'gonioGrade gonioExpert', 'data-position' => 'sup'))?>
 			</div>
 			<div class="data">
-				<?php echo CHtml::activeDropDownList($model, $side.'_gonio_id', $model->getGonioscopyOptions())?>
+				<?php echo CHtml::activeDropDownList($model, $side.'_gonio_tem_id', $model->getGonioscopyOptions(), array('class' => 'gonioGrade gonioExpert', 'data-position' => 'tem'))?>
+			</div>
+			<div class="data">
+				<?php echo CHtml::activeDropDownList($model, $side.'_gonio_nas_id', $model->getGonioscopyOptions(), array('class' => 'gonioGrade gonioExpert', 'data-position' => 'nas'))?>
+			</div>
+			<div class="data">
+				<?php echo CHtml::activeDropDownList($model, $side.'_gonio_inf_id', $model->getGonioscopyOptions(), array('class' => 'gonioGrade gonioExpert', 'data-position' => 'inf'))?>
 			</div>
 		</div>
 		<?php if($model->getSetting('expert')) { ?>
@@ -65,6 +70,22 @@
 			</div>
 			<div class="data">
 				<?php echo CHtml::activeDropDownList($model, $side.'_van_herick_id', $model->getVanHerickOptions())?>
+			</div>
+		</div>
+		<?php } else { ?>
+		<div>
+			<?php $basic_options = array('0' => 'No', '1' => 'Yes'); ?>
+			<div class="data">
+				<?php echo CHtml::dropDownList($side.'_gonio_sup_basic', null, $basic_options, array('class' => 'gonioGrade gonioBasic', 'data-position' => 'sup'))?>
+			</div>
+			<div class="data">
+				<?php echo CHtml::dropDownList($side.'_gonio_tem_basic', null, $basic_options, array('class' => 'gonioGrade gonioBasic', 'data-position' => 'tem'))?>
+			</div>
+			<div class="data">
+				<?php echo CHtml::dropDownList($side.'_gonio_nas_basic', null, $basic_options, array('class' => 'gonioGrade gonioBasic', 'data-position' => 'nas'))?>
+			</div>
+			<div class="data">
+				<?php echo CHtml::dropDownList($side.'_gonio_inf_basic', null, $basic_options, array('class' => 'gonioGrade gonioBasic', 'data-position' => 'inf'))?>
 			</div>
 		</div>
 		<?php } ?>
@@ -81,7 +102,7 @@
 		<button class="ed_report">Report</button>
 		<button class="ed_clear">Clear</button>
 	</div>
-	<?php }else{?>
+	<?php } else { ?>
 	<div class="eyedrawFields view">
 		<div>
 			<div class="data">
@@ -90,9 +111,16 @@
 		</div>
 		<div>
 			<div class="data">
-				<?php echo $model->getAttributeLabel($side.'_gonio_id') ?>
-				:
-				<?php if($gonio = $model->{$side.'_gonio'}) { 
+				<?php if($gonio = $model->{$side.'_gonio_sup'}) { 
+					echo $gonio->name;
+				} ?>
+				<?php if($gonio = $model->{$side.'_gonio_tem'}) { 
+					echo $gonio->name;
+				} ?>
+				<?php if($gonio = $model->{$side.'_gonio_nas'}) { 
+					echo $gonio->name;
+				} ?>
+				<?php if($gonio = $model->{$side.'_gonio_inf'}) { 
 					echo $gonio->name;
 				} ?>
 			</div>
@@ -111,5 +139,5 @@
 		</div>
 		<?php } ?>
 	</div>
-	<?php }?>
+	<?php } ?>
 </div>
