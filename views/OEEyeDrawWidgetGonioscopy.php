@@ -120,11 +120,13 @@
 	</div>
 	<?php } else { ?>
 	<div class="eyedrawFields view">
+		<?php if($model->{$side.'_description'}) { ?>
 		<div>
 			<div class="data">
 				<?php echo $model->{$side.'_description'} ?>
 			</div>
 		</div>
+		<?php } ?>
 		<div>
 			<div class="data">
 				<div class="data gonioCross">
