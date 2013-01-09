@@ -66,6 +66,16 @@
 				</div>
 			</div>
 			<div>
+			</div>
+			<div>
+				<div class="label">
+					<?php echo $model->getAttributeLabel($side.'_surgeon_id'); ?>:
+				</div>
+				<div class="data">
+					<?php echo CHtml::activeDropDownList($model, $side.'_surgeon_id', CHtml::listData(OphCiExamination_AnteriorSegment_Surgeon::model()->findAll(array('order'=>'display_order')),'id','name'), array('class' => 'surgeon'))?>
+				</div>
+			</div>
+			<div>
 				<div class="label">
 					<?php echo $model->getAttributeLabel($side.'_pcr_risk'); ?>:
 				</div>
@@ -124,6 +134,14 @@
 				</div>
 				<div class="data">
 					<?php echo $model->{$side.'_cortical'}->name ?>
+				</div>
+			</div>
+			<div class="aligned">
+				<div class="label">
+					<?php echo $model->getAttributeLabel($side.'_surgeon_id') ?>:
+				</div>
+				<div class="data">
+					<?php echo $model->{$side.'_surgeon'}->name ?>
 				</div>
 			</div>
 			<?php if($pcr_risk = $model->{$side.'_pcr_risk'}) { ?>
