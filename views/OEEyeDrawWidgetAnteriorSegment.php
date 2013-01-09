@@ -68,6 +68,22 @@
 			<div>
 			</div>
 			<div>
+				<div class="data">
+					<?php echo CHtml::activeCheckBox($model, $side.'_pxe', array('class' => 'pxe')) ?>
+				</div>
+				<div class="label">
+					<?php echo $model->getAttributeLabel($side.'_pxe'); ?>
+				</div>
+			</div>
+			<div>
+				<div class="data">
+					<?php echo CHtml::activeCheckBox($model, $side.'_phako', array('class' => 'phako')) ?>
+				</div>
+				<div class="label">
+					<?php echo $model->getAttributeLabel($side.'_phako'); ?>
+				</div>
+			</div>
+			<div>
 				<div class="label">
 					<?php echo $model->getAttributeLabel($side.'_surgeon_id'); ?>:
 				</div>
@@ -82,22 +98,6 @@
 				<div class="data">
 					<button class="calculate_risk">=</button>
 					<?php echo CHtml::activeTextField($model, $side.'_pcr_risk', array('class' => 'risk')) ?> %
-				</div>
-			</div>
-			<div>
-				<div class="data">
-					<?php echo CHtml::activeCheckBox($model, $side.'_pxe', array('class' => 'pxe')) ?>
-				</div>
-				<div class="label">
-					<?php echo $model->getAttributeLabel($side.'_pxe'); ?>
-				</div>
-			</div>
-			<div>
-				<div class="data">
-					<?php echo CHtml::activeCheckBox($model, $side.'_phako', array('class' => 'phako')) ?>
-				</div>
-				<div class="label">
-					<?php echo $model->getAttributeLabel($side.'_phako'); ?>
 				</div>
 			</div>
 			<button class="ed_report">Report</button>
@@ -136,6 +136,20 @@
 					<?php echo $model->{$side.'_cortical'}->name ?>
 				</div>
 			</div>
+			<?php if($model->{$side.'_pxe'}) { ?>
+			<div>
+				<div class="data">
+					<?php echo $model->getAttributeLabel($side.'_pxe') ?>
+				</div>
+			</div>
+			<?php } ?>
+			<?php if($model->{$side.'_phako'}) { ?>
+			<div>
+				<div class="data">
+					<?php echo $model->getAttributeLabel($side.'_phako') ?>
+				</div>
+			</div>
+			<?php } ?>
 			<div class="aligned">
 				<div class="label">
 					<?php echo $model->getAttributeLabel($side.'_surgeon_id') ?>:
@@ -151,20 +165,6 @@
 				</div>
 				<div class="data">
 					<?php echo $pcr_risk ?>%
-				</div>
-			</div>
-			<?php } ?>
-			<?php if($model->{$side.'_pxe'}) { ?>
-			<div>
-				<div class="data">
-					<?php echo $model->getAttributeLabel($side.'_pxe') ?>
-				</div>
-			</div>
-			<?php } ?>
-			<?php if($model->{$side.'_phako'}) { ?>
-			<div>
-				<div class="data">
-					<?php echo $model->getAttributeLabel($side.'_phako') ?>
 				</div>
 			</div>
 			<?php } ?>
