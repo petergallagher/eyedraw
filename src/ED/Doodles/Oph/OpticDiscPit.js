@@ -54,7 +54,6 @@ ED.OpticDiscPit.prototype.setHandles = function() {
  */
 ED.OpticDiscPit.prototype.setPropertyDefaults = function() {
 	this.isSqueezable = true;
-	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['originX']['range'].setMinAndMax(-150, +150);
@@ -77,6 +76,13 @@ ED.OpticDiscPit.prototype.setParameterDefaults = function() {
 	} else {
 		this.originX = 50;
 	}
+        var doodle = this.drawing.lastDoodleOfClass(this.className);
+        if (doodle) {
+                var np = new ED.Point(doodle.originX + (this.drawing.eye == ED.eye.Right ? -150 : 150), 0);
+                this.move(np.x, np.y);
+        } else {
+                //this.move((this.drawing.eye == ED.eye.Right ? -1 : 1) * 100, 0);
+        }
 }
 
 /**
