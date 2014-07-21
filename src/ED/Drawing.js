@@ -515,9 +515,6 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 		// Instantiate a new doodle object with parameters from doodle set
 		this.doodleArray[i] = new ED[_doodleSet[i].subclass](this, _doodleSet[i]);
 		this.doodleArray[i].id = i;
-
-		// Apply global scale factor
-		this.doodleArray[i].setScaleLevel(this.globalScaleFactor);
 	}
 
 	// Sort array by order (puts back doodle first)
@@ -1997,11 +1994,6 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 		// New doodles are selected by default
 		this.selectedDoodle = newDoodle;
 
-		// Apply global scale factor
-		newDoodle.setScaleLevel(this.globalScaleFactor);
-		// newDoodle.scaleX = newDoodle.origScaleX * this.globalScaleFactor;
-		// newDoodle.scaleY = newDoodle.origScaleY * this.globalScaleFactor;
-
 		// If drawable, also go into drawing mode
 		if (newDoodle.isDrawable) {
 			newDoodle.isForDrawing = true;
@@ -2177,8 +2169,9 @@ ED.Drawing.prototype.addDeleteValues = function(_deleteValuesArray) {
 ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elementId, _value) {
 	//console.log("Event: " + _type + " doodleId: " + _doodleId + " doodleClass: " + _className + " elementId: " + _elementId + " value: " + _value);
 
+
 	switch (_type) {
-		// Onchange event
+		case 'oninput':
 		case 'onchange':
 			// Get reference to associated doodle
 			var doodle = this.doodleOfId(_doodleId);
@@ -2200,8 +2193,8 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
 						}
 					}
 
-					// Check validity of new value
-					var validityArray = doodle.validateParameter(parameter, _value);
+					// Check validity of new value, only trim the value if change event
+					var validityArray = doodle.validateParameter(parameter, _value, (_type === 'onchange'));
 
 					// If new value is valid, set it
 					if (validityArray.valid) {
@@ -2732,6 +2725,7 @@ ED.Drawing.prototype.clear = function() {
 
 	// Set context transform to map from doodle plane to canvas plane
 	this.context.translate(this.canvas.width / 2, this.canvas.height / 2);
+
 	this.context.scale(this.scale, this.scale);
 }
 
