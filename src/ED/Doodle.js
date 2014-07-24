@@ -82,8 +82,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		// Store created time
 		this.createdTime = (new Date()).getTime();
 
-		// Set initial scale level (the scale level will be adjusted later only once
-		// params have been set)
+		// Set initial scale level
 		this.scaleLevel = 1;
 
 		// Dragging defaults - set individual values in subclasses

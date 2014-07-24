@@ -227,7 +227,7 @@
 				expect(zoomedData.apexY).to.equal(testData.apexY, 'apexY should match');
 			});
 
-			it('Should save drawing data correctly when the doodle is sized', function() {
+			it('Should save drawing data correctly when the doodle size is changed', function() {
 
 				var drawing = createDrawing();
 
@@ -265,6 +265,68 @@
 				expect(zoomedData.originY).to.equal(testData.originY, 'originY should match');
 				expect(zoomedData.width).to.equal(testData.width, 'width should match');
 				expect(zoomedData.height).to.equal(testData.height, 'height should match');
+			});
+
+			describe('Auto scaling the drawing', function() {
+
+				ED.TestDoodle1 = function(_drawing, _parameterJSON) {
+					this.className = 'TestDoodle1';
+					this.requiredScale = 0.72;
+					ED.Doodle.call(this, _drawing, _parameterJSON);;
+				}
+				ED.TestDoodle1.prototype = Object.create(ED.Doodle.prototype);
+
+				ED.TestDoodle2 = function(_drawing, _parameterJSON) {
+					this.className = 'TestDoodle2';
+					this.requiredScale = 0.5;
+					ED.Doodle.call(this, _drawing, _parameterJSON);;
+				}
+				ED.TestDoodle2.prototype = Object.create(ED.Doodle.prototype);
+
+				ED.TestDoodle3 = function(_drawing, _parameterJSON) {
+					this.className = 'TestDoodle3';
+					ED.Doodle.call(this, _drawing, _parameterJSON);;
+				}
+				ED.TestDoodle3.prototype = Object.create(ED.Doodle.prototype);
+
+
+				it('Should scale the drawing when a doodle is added and removed', function() {
+
+					var drawing = createDrawing();
+
+					drawing.addDoodle('TestDoodle1');
+
+					expect(drawing.globalScaleFactor).to.equal(0.72,
+						'The drawing scale should match the scale of the added doodle if the doodle has specified a required scale');
+
+					drawing.deleteDoodle(drawing.doodleArray[0]);
+					expect(drawing.globalScaleFactor).to.equal(1,
+						'The scale should default to 1 if no doodles have been added');
+				});
+
+				it('Should scale the drawing correctly when multiple doodles are added and removed', function() {
+
+					var drawing = createDrawing();
+
+					drawing.addDoodle('TestDoodle1');
+					drawing.addDoodle('TestDoodle2');
+					drawing.addDoodle('TestDoodle3');
+
+					expect(drawing.globalScaleFactor).to.equal(0.5,
+						'The scale should be the lowest of all added doodles');
+
+					drawing.deleteDoodle(drawing.doodleArray[1]); // Remove TestDoodle2
+					expect(drawing.globalScaleFactor).to.equal(0.72,
+						'The scale should be the lowest of all added doodles')
+
+					drawing.deleteDoodle(drawing.doodleArray[1]); // Remove TestDoodle3
+					expect(drawing.globalScaleFactor).to.equal(0.72,
+						'The scale should be the lowest of all added doodles');
+
+					drawing.deleteDoodle(drawing.doodleArray[0]); // Remove TestDoodle1
+					expect(drawing.globalScaleFactor).to.equal(1,
+						'The scale should default to 1 if no doodles have been added');
+				});
 			});
 		});
 	});

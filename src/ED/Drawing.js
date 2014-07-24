@@ -1649,6 +1649,8 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle) {
 			this.doodleArray[i].order = i;
 		}
 
+		this.setScaleFromDoodles();
+
 		// Refresh canvas
 		this.repaint();
 
@@ -1716,6 +1718,23 @@ ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level) {
 ED.Drawing.prototype.setScaleLevel = function(level) {
 	this.setScaleForDrawingAndDoodles(level);
 	this.notifyZoomLevel();
+};
+
+/**
+ * Sets the drawing scale to be the lowest from all added doodles.
+ */
+ED.Drawing.prototype.setScaleFromDoodles = function() {
+
+	// We only scale down.
+	var lowestLevel = 1;
+
+	this.doodleArray.forEach(function(doodle) {
+		if (doodle.requiredScale && +doodle.requiredScale < lowestLevel) {
+			lowestLevel = doodle.requiredScale;
+		}
+	});
+
+	this.setScaleLevel(lowestLevel);
 };
 
 /**
@@ -2085,6 +2104,10 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 		} else {
 			// Refresh drawing
 			this.repaint();
+		}
+
+		if (newDoodle.requiredScale) {
+			this.setScaleLevel(newDoodle.requiredScale);
 		}
 
 		// Notify
