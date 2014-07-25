@@ -1964,12 +1964,12 @@ ED.Drawing.prototype.resetEyedraw = function() {
  * @param  {Number} level     Scale level.
  * @param  {String} eventName Event name to notify.
  */
-ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level) {
+ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(_level) {
 
-	this.globalScaleFactor = level;
+	this.globalScaleFactor = _level;
 
 	this.doodleArray.forEach(function(doodle) {
-		doodle.setScaleLevel(level);
+		doodle.setScaleLevel(_level);
 	});
 
 	this.repaint();
@@ -1977,10 +1977,15 @@ ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level) {
 
 /**
  * This should be called only once the drawing is ready.
- * @param {[type]} level [description]
+ * @param {Number} level The scale level
+ * @param {Boolean} _validateLevel If true, the level will not be applied if
+ * the current level is less than the specified level.
  */
-ED.Drawing.prototype.setScaleLevel = function(level) {
-	this.setScaleForDrawingAndDoodles(level);
+ED.Drawing.prototype.setScaleLevel = function(_level, _validateLevel) {
+	if (_validateLevel && this.getLowestDoodleScaleLevel() < _level) {
+		return;
+	}
+	this.setScaleForDrawingAndDoodles(_level);
 	this.notifyZoomLevel();
 };
 
@@ -1988,6 +1993,11 @@ ED.Drawing.prototype.setScaleLevel = function(level) {
  * Sets the drawing scale to be the lowest from all added doodles.
  */
 ED.Drawing.prototype.setScaleFromDoodles = function() {
+	var level = this.getLowestDoodleScaleLevel();
+	this.setScaleLevel(level);
+};
+
+ED.Drawing.prototype.getLowestDoodleScaleLevel = function() {
 
 	var lowestLevel = this.origScaleLevel;
 
@@ -1997,7 +2007,7 @@ ED.Drawing.prototype.setScaleFromDoodles = function() {
 		}
 	});
 
-	this.setScaleLevel(lowestLevel);
+	return lowestLevel;
 };
 
 /**
@@ -2370,7 +2380,7 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 		}
 
 		if (newDoodle.requiredScale) {
-			this.setScaleLevel(newDoodle.requiredScale);
+			this.setScaleLevel(newDoodle.requiredScale, true);
 		}
 
 		// Notify

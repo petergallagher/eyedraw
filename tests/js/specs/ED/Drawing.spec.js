@@ -316,14 +316,14 @@
 
 					var drawing = createDrawing();
 
-					drawing.addDoodle('TestDoodle1');
 					drawing.addDoodle('TestDoodle2');
+					drawing.addDoodle('TestDoodle1');
 					drawing.addDoodle('TestDoodle3');
 
 					expect(drawing.globalScaleFactor).to.equal(0.5,
 						'The scale should be the lowest of all added doodles');
 
-					drawing.deleteDoodle(drawing.doodleArray[1]); // Remove TestDoodle2
+					drawing.deleteDoodle(drawing.doodleArray[0]); // Remove TestDoodle2
 					expect(drawing.globalScaleFactor).to.equal(0.72,
 						'The scale should be the lowest of all added doodles')
 
