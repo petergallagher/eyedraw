@@ -764,6 +764,7 @@ ED.Drawing.prototype.loadDoodles = function(_id) {
  * @param {Set} _doodleSet Set of doodles from server
  */
 ED.Drawing.prototype.load = function(_doodleSet) {
+
 	// Iterate through set of doodles and load into doodle array
 	for (var i = 0; i < _doodleSet.length; i++) {
 		// Check that class definition exists, otherwise skip it
@@ -781,6 +782,9 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 	this.doodleArray.sort(function(a, b) {
 		return a.order - b.order
 	});
+
+	// Set the drawing scale
+	this.setScaleFromDoodles();
 }
 
 /**
@@ -1909,6 +1913,8 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle) {
 			this.doodleArray[i].order = i;
 		}
 
+		this.setScaleFromDoodles();
+
 		// Refresh canvas
 		this.repaint();
 
@@ -1976,6 +1982,22 @@ ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level) {
 ED.Drawing.prototype.setScaleLevel = function(level) {
 	this.setScaleForDrawingAndDoodles(level);
 	this.notifyZoomLevel();
+};
+
+/**
+ * Sets the drawing scale to be the lowest from all added doodles.
+ */
+ED.Drawing.prototype.setScaleFromDoodles = function() {
+
+	var lowestLevel = this.origScaleLevel;
+
+	this.doodleArray.forEach(function(doodle) {
+		if (doodle.requiredScale && +doodle.requiredScale < lowestLevel) {
+			lowestLevel = doodle.requiredScale;
+		}
+	});
+
+	this.setScaleLevel(lowestLevel);
 };
 
 /**
@@ -2345,6 +2367,10 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 		} else {
 			// Refresh drawing
 			this.repaint();
+		}
+
+		if (newDoodle.requiredScale) {
+			this.setScaleLevel(newDoodle.requiredScale);
 		}
 
 		// Notify
@@ -3269,8 +3295,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		// Store created time
 		this.createdTime = (new Date()).getTime();
 
-		// Set initial scale level (the scale level will be adjusted later only once
-		// params have been set)
+		// Set initial scale level
 		this.scaleLevel = 1;
 
 		// Dragging defaults - set individual values in subclasses
@@ -5225,9 +5250,11 @@ ED.Doodle.prototype.json = function() {
 	var s = '{';
 
 	// Version and doodle subclass
-	s = s + '"scaleLevel": ' + this.scaleLevel + ',';
 	s = s + '"version":' + this.version.toFixed(1) + ',';
 	s = s + '"subclass":' + '"' + this.className + '",';
+
+	// This is a legacy "toggleZoom" feature.
+	// s = s + '"scaleLevel": ' + this.scaleLevel + ',';
 
 	// Only save values of parameters specified in savedParameterArray
 	if (typeof(this.savedParameterArray) != 'undefined') {
@@ -7982,7 +8009,7 @@ ED.Views.Toolbar.Main = (function() {
 
 	return MainToolbar;
 }());
-/*! Generated on 16/7/2014 */
+/*! Generated on 25/7/2014 */
 ED.scriptTemplates = {
   "doodle-popup": "\n\n\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t{{#desc}}\n\t\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t\t</a>\n\t\t\t{{/desc}}\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t{{#doodle.isDeletable}}\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t{{/doodle.isDeletable}}\n\t\t</li>\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
 };

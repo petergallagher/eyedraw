@@ -2037,9 +2037,11 @@ ED.Doodle.prototype.json = function() {
 	var s = '{';
 
 	// Version and doodle subclass
-	s = s + '"scaleLevel": ' + this.scaleLevel + ',';
 	s = s + '"version":' + this.version.toFixed(1) + ',';
 	s = s + '"subclass":' + '"' + this.className + '",';
+
+	// This is a legacy "toggleZoom" feature.
+	// s = s + '"scaleLevel": ' + this.scaleLevel + ',';
 
 	// Only save values of parameters specified in savedParameterArray
 	if (typeof(this.savedParameterArray) != 'undefined') {

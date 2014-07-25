@@ -504,6 +504,7 @@ ED.Drawing.prototype.loadDoodles = function(_id) {
  * @param {Set} _doodleSet Set of doodles from server
  */
 ED.Drawing.prototype.load = function(_doodleSet) {
+
 	// Iterate through set of doodles and load into doodle array
 	for (var i = 0; i < _doodleSet.length; i++) {
 		// Check that class definition exists, otherwise skip it
@@ -521,6 +522,9 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 	this.doodleArray.sort(function(a, b) {
 		return a.order - b.order
 	});
+
+	// Set the drawing scale
+	this.setScaleFromDoodles();
 }
 
 /**
@@ -1725,8 +1729,7 @@ ED.Drawing.prototype.setScaleLevel = function(level) {
  */
 ED.Drawing.prototype.setScaleFromDoodles = function() {
 
-	// We only scale down.
-	var lowestLevel = 1;
+	var lowestLevel = this.origScaleLevel;
 
 	this.doodleArray.forEach(function(doodle) {
 		if (doodle.requiredScale && +doodle.requiredScale < lowestLevel) {

@@ -2,24 +2,25 @@
 
 	'use strict';
 
-	function createDrawing() {
+	function createDrawing(opts, data) {
 
-		var dom = createDOM();
+		var dom = createDOM(data);
 
-		var opts = 	{
+		var opts = 	$.extend({}, {
 			drawingName: 'drawing name',
 			offsetX: 0,
 			offsetY: 0,
 			toImage: false,
 			graphicsPath: '../../assets/img',
 			scale: 1
-		}
+		}, opts);
+
 		return new ED.Drawing(dom.canvas[0], 1, 'idSuffix', true, opts);
 	}
 
 	describe('Drawing', function() {
 
-		after(function() {
+		afterEach(function() {
 			$('.ed-widget').empty().remove();
 		});
 
@@ -299,7 +300,7 @@
 
 				it('Should scale the drawing when a doodle is added and removed', function() {
 
-					var drawing = createDrawing();
+					var drawing = createDrawing({ scale: 0.9 });
 
 					drawing.addDoodle('TestDoodle1');
 
@@ -307,8 +308,8 @@
 						'The drawing scale should match the scale of the added doodle if the doodle has specified a required scale');
 
 					drawing.deleteDoodle(drawing.doodleArray[0]);
-					expect(drawing.globalScaleFactor).to.equal(1,
-						'The scale should default to 1 if no doodles have been added');
+					expect(drawing.globalScaleFactor).to.equal(0.9,
+						'The scale should default to the initial drawing scale if no doodles have been added');
 				});
 
 				it('Should scale the drawing correctly when multiple doodles are added and removed', function() {
@@ -333,6 +334,31 @@
 					drawing.deleteDoodle(drawing.doodleArray[0]); // Remove TestDoodle1
 					expect(drawing.globalScaleFactor).to.equal(1,
 						'The scale should default to 1 if no doodles have been added');
+				});
+
+				it('Should scale the drawing correctly when loading doodles (eg when in "view/display" mode)', function() {
+
+					var drawing = createDrawing({},[
+						 {
+								"version":1.1,
+								"subclass":"TestDoodle1",
+								"rotation":315,
+								"apexY":-300,
+								"order":1
+						 },
+						 {
+								"version":1.1,
+								"subclass":"TestDoodle2",
+								"rotation":315,
+								"apexY":-300,
+								"order":2
+						 }
+					]);
+
+					drawing.loadDoodles('inputID');
+
+					expect(drawing.globalScaleFactor).to.equal(0.5,
+						'The drawing scale should match the lowest scale of the added doodles');
 				});
 			});
 		});

@@ -1,4 +1,4 @@
-function createDOM() {
+function createDOM(data) {
 
 	var container = $('<div />', {
 		'class': 'ed-widget'
@@ -16,7 +16,7 @@ function createDOM() {
 	var input = $('<input />', {
 		type: 'hidden',
 		id: 'inputID',
-		value: JSON.stringify({ test: 'testing' })
+		value: data ? JSON.stringify(data) : ''
 	}).appendTo(container);
 
 	var mainToolbar = $('<div />', {
