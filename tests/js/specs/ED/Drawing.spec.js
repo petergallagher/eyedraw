@@ -269,26 +269,33 @@
 
 			describe('Auto scaling the drawing', function() {
 
-				ED.TestDoodle1 = function(_drawing, _parameterJSON) {
-					this.className = 'TestDoodle1';
-					this.requiredScale = 0.72;
-					ED.Doodle.call(this, _drawing, _parameterJSON);;
-				}
-				ED.TestDoodle1.prototype = Object.create(ED.Doodle.prototype);
+				before(function createDoodles() {
+					ED.TestDoodle1 = function(_drawing, _parameterJSON) {
+						this.className = 'TestDoodle1';
+						this.requiredScale = 0.72;
+						ED.Doodle.call(this, _drawing, _parameterJSON);;
+					}
+					ED.TestDoodle1.prototype = Object.create(ED.Doodle.prototype);
 
-				ED.TestDoodle2 = function(_drawing, _parameterJSON) {
-					this.className = 'TestDoodle2';
-					this.requiredScale = 0.5;
-					ED.Doodle.call(this, _drawing, _parameterJSON);;
-				}
-				ED.TestDoodle2.prototype = Object.create(ED.Doodle.prototype);
+					ED.TestDoodle2 = function(_drawing, _parameterJSON) {
+						this.className = 'TestDoodle2';
+						this.requiredScale = 0.5;
+						ED.Doodle.call(this, _drawing, _parameterJSON);;
+					}
+					ED.TestDoodle2.prototype = Object.create(ED.Doodle.prototype);
 
-				ED.TestDoodle3 = function(_drawing, _parameterJSON) {
-					this.className = 'TestDoodle3';
-					ED.Doodle.call(this, _drawing, _parameterJSON);;
-				}
-				ED.TestDoodle3.prototype = Object.create(ED.Doodle.prototype);
+					ED.TestDoodle3 = function(_drawing, _parameterJSON) {
+						this.className = 'TestDoodle3';
+						ED.Doodle.call(this, _drawing, _parameterJSON);;
+					}
+					ED.TestDoodle3.prototype = Object.create(ED.Doodle.prototype);
+				});
 
+				after(function deleteDoodles() {
+					delete ED.TestDoodle1;
+					delete ED.TestDoodle2;
+					delete ED.TestDoodle3;
+				});
 
 				it('Should scale the drawing when a doodle is added and removed', function() {
 
