@@ -779,6 +779,14 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 		// Instantiate a new doodle object with parameters from doodle set
 		this.doodleArray[i] = new ED[_doodleSet[i].subclass](this, _doodleSet[i]);
 		this.doodleArray[i].id = i;
+
+		// Get and set specified parameter defaults
+		var _parameterDefaults = {};
+		if (this.doodleParameterDefaults && this.doodleParameterDefaults[this.doodleArray[i].className]) {
+			_parameterDefaults = this.doodleParameterDefaults[this.doodleArray[i].className];
+		}
+
+		this.setDoodleParameters(this.doodleArray[i], _parameterDefaults);
 	}
 
 	// Sort array by order (puts back doodle first)
@@ -2279,17 +2287,7 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 			this.doodleArray[i].isSelected = false;
 		}
 
-		// Set parameters for this doodle
-		if (typeof(_parameterDefaults) != 'undefined') {
-			for (var key in _parameterDefaults) {
-				var res = newDoodle.validateParameter(key, _parameterDefaults[key]);
-				if (res.valid) {
-					newDoodle.setParameterFromString(key, res.value);
-				} else {
-					ED.errorHandler('ED.Drawing', 'addDoodle', 'ParameterDefaults array contains an invalid value for parameter ' + key);
-				}
-			}
-		}
+		this.setDoodleParameters(newDoodle, _parameterDefaults);
 
 		// New doodles are selected by default
 		this.selectedDoodle = newDoodle;
@@ -2404,6 +2402,20 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 		return null;
 	}
 }
+
+ED.Drawing.prototype.setDoodleParameters = function(_doodle, _parameterDefaults) {
+	// Set parameters for this doodle
+	if (typeof(_parameterDefaults) != 'undefined') {
+		for (var key in _parameterDefaults) {
+			var res = _doodle.validateParameter(key, _parameterDefaults[key]);
+			if (res.valid) {
+				_doodle.setParameterFromString(key, res.value);
+			} else {
+				ED.errorHandler('ED.Drawing', 'setDoodleParameters', 'ParameterDefaults array contains an invalid value for parameter ' + key);
+			}
+		}
+	}
+};
 
 /**
  * Takes array of bindings, and adds them to the corresponding doodles. Adds an event listener to create a doodle if it does not exist
@@ -41107,6 +41119,13 @@ ED.Tube.prototype.setPropertyDefaults = function() {
 		type: 'string',
 		list: ['STQ', 'SNQ', 'INQ', 'ITQ'],
 		animate: true
+	};
+
+	// This is a bit of a hack. It allows us to set the isDeletable property
+	// when adding this doodle to a drawing.
+	this.parameterValidationArray['isDeletable'] = {
+		type: 'bool',
+		display: false
 	};
 
 	// Array of angles to snap to
