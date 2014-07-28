@@ -34,7 +34,7 @@
 <body>
 	<div class="container main" role="main">
 
-		<p>This example shows how to init an eyedraw.</p>
+		<p>This example shows how to init an eyedraw while specifying default doodle params.</p>
 
 		<!-- EYEDRAW WIDGET START -->
 		<div class="ed-widget" id="eyedrawwidget_example">
@@ -44,6 +44,12 @@
 
 				<!-- PANEL START -->
 				<ul class="ed-toolbar-panel ed-main-toolbar">
+					<li>
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="Tube">
+							<span class="icon-ed-Tube"></span>
+							<span class="label">Posterior chamber IOL</span>
+						</a>
+					</li>
 					<li>
 						<a class="ed-button" href="#" data-function="addDoodle" data-arg="NuclearCataract">
 							<span class="icon-ed-NuclearCataract"></span>
@@ -184,7 +190,7 @@
 		ED.init({
 			canvasId: "ed_example",
 			eye: 0,
-			scale: 1,
+			scale: .7,
 			idSuffix: "AntSeg",
 			isEditable: true,
 			focus: false,

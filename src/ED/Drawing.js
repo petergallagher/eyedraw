@@ -519,6 +519,19 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 		// Instantiate a new doodle object with parameters from doodle set
 		this.doodleArray[i] = new ED[_doodleSet[i].subclass](this, _doodleSet[i]);
 		this.doodleArray[i].id = i;
+
+		// Get specified parameter defaults
+		var parameterDefaults = {};
+		if (this.doodleParameterDefaults && this.doodleParameterDefaults[this.doodleArray[i].className]) {
+			parameterDefaults = this.doodleParameterDefaults[this.doodleArray[i].className];
+		}
+		// Don't set params for values that already exist
+		for(var param in parameterDefaults) {
+			if (param in _doodleSet[i]) {
+				delete parameterDefaults[param];
+			}
+		}
+		this.setDoodleParameters(this.doodleArray[i], parameterDefaults);
 	}
 
 	// Sort array by order (puts back doodle first)
@@ -2019,17 +2032,8 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 			this.doodleArray[i].isSelected = false;
 		}
 
-		// Set parameters for this doodle
-		if (typeof(_parameterDefaults) != 'undefined') {
-			for (var key in _parameterDefaults) {
-				var res = newDoodle.validateParameter(key, _parameterDefaults[key]);
-				if (res.valid) {
-					newDoodle.setParameterFromString(key, res.value);
-				} else {
-					ED.errorHandler('ED.Drawing', 'addDoodle', 'ParameterDefaults array contains an invalid value for parameter ' + key);
-				}
-			}
-		}
+		// Set params from defaults
+		this.setDoodleParameters(newDoodle, _parameterDefaults);
 
 		// New doodles are selected by default
 		this.selectedDoodle = newDoodle;
@@ -2144,6 +2148,24 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 		return null;
 	}
 }
+
+/**
+ * Set doodle params
+ * @param {ED.Doodle} _doodle            A doodle instance
+ * @param {Object} _parameterDefaults Parameter keys/values
+ */
+ED.Drawing.prototype.setDoodleParameters = function(_doodle, _parameterDefaults) {
+	if (typeof(_parameterDefaults) != 'undefined') {
+		for (var key in _parameterDefaults) {
+			var res = _doodle.validateParameter(key, _parameterDefaults[key]);
+			if (res.valid) {
+				_doodle.setParameterFromString(key, res.value);
+			} else {
+				ED.errorHandler('ED.Drawing', 'setDoodleParameters', 'ParameterDefaults array contains an invalid value for parameter ' + key);
+			}
+		}
+	}
+};
 
 /**
  * Takes array of bindings, and adds them to the corresponding doodles. Adds an event listener to create a doodle if it does not exist

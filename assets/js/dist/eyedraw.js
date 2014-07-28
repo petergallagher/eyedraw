@@ -780,13 +780,18 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 		this.doodleArray[i] = new ED[_doodleSet[i].subclass](this, _doodleSet[i]);
 		this.doodleArray[i].id = i;
 
-		// Get and set specified parameter defaults
-		var _parameterDefaults = {};
+		// Get specified parameter defaults
+		var parameterDefaults = {};
 		if (this.doodleParameterDefaults && this.doodleParameterDefaults[this.doodleArray[i].className]) {
-			_parameterDefaults = this.doodleParameterDefaults[this.doodleArray[i].className];
+			parameterDefaults = this.doodleParameterDefaults[this.doodleArray[i].className];
 		}
-
-		this.setDoodleParameters(this.doodleArray[i], _parameterDefaults);
+		// Don't set params for values that already exist
+		for(var param in parameterDefaults) {
+			if (param in _doodleSet[i]) {
+				delete parameterDefaults[param];
+			}
+		}
+		this.setDoodleParameters(this.doodleArray[i], parameterDefaults);
 	}
 
 	// Sort array by order (puts back doodle first)
@@ -2287,6 +2292,7 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 			this.doodleArray[i].isSelected = false;
 		}
 
+		// Set params from defaults
 		this.setDoodleParameters(newDoodle, _parameterDefaults);
 
 		// New doodles are selected by default
@@ -2403,8 +2409,12 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 	}
 }
 
+/**
+ * Set doodle params
+ * @param {ED.Doodle} _doodle            A doodle instance
+ * @param {Object} _parameterDefaults Parameter keys/values
+ */
 ED.Drawing.prototype.setDoodleParameters = function(_doodle, _parameterDefaults) {
-	// Set parameters for this doodle
 	if (typeof(_parameterDefaults) != 'undefined') {
 		for (var key in _parameterDefaults) {
 			var res = _doodle.validateParameter(key, _parameterDefaults[key]);

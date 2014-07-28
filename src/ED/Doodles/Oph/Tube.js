@@ -90,6 +90,13 @@ ED.Tube.prototype.setPropertyDefaults = function() {
 		animate: true
 	};
 
+	// This is a bit of a hack. It allows us to set the isDeletable property
+	// when adding this doodle to a drawing.
+	this.parameterValidationArray['isDeletable'] = {
+		type: 'bool',
+		display: false
+	};
+
 	// Array of angles to snap to
 	var phi = Math.PI / 4;
 	this.anglesArray = [phi, 3 * phi, 5 * phi, 7 * phi];
