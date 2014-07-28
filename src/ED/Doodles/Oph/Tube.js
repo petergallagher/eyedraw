@@ -28,16 +28,19 @@ ED.Tube = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Tube";
 
+	// Set required scale
+	this.requiredScale = 0.72;
+
 	// Derived parameters
 	this.type = 'Baerveldt 103-250';
 	this.platePosition = 'STQ';
-	
+
 	// Other Parameters
 	this.bezierArray = new Array();
 
 	// Saved parameters
 	this.savedParameterArray = ['rotation', 'apexY', 'type'];
-	
+
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'type':'Type'};
 
@@ -185,7 +188,7 @@ ED.Tube.prototype.draw = function(_point) {
 
 	// Vertical shift
 	var d = -740;
-	
+
 	switch (this.type) {
 		case 'Ahmed FP7':
 			// Plate
@@ -218,7 +221,7 @@ ED.Tube.prototype.draw = function(_point) {
 			ctx.lineTo(160 * s, 230 * s + d);
 			ctx.bezierCurveTo(120 * s, 250 * s + d, -120 * s, 250 * s + d, -160 * s, 230 * s + d);
 			break;
-			
+
 		case 'Ahmed S3':
 			// Plate
 			ctx.moveTo(-100 * s, 230 * s + d);
@@ -228,7 +231,7 @@ ED.Tube.prototype.draw = function(_point) {
 			ctx.lineTo(-100 * s, -230 * s + d);
 			ctx.lineTo(-200 * s, 0 * s + d);
 			ctx.lineTo(-100 * s, 230 * s + d);
-				
+
 			// Connection flange
 			ctx.moveTo(-100 * s, 230 * s + d);
 			ctx.lineTo(-100 * s, 290 * s + d);
@@ -252,7 +255,7 @@ ED.Tube.prototype.draw = function(_point) {
 			ctx.lineTo(160 * s, 230 * s + d);
 			ctx.bezierCurveTo(120 * s, 250 * s + d, -120 * s, 250 * s + d, -160 * s, 230 * s + d);
 			break;
-			
+
 		case 'Baerveldt 101-350':
 			// Plate
 			ctx.moveTo(0, 230 * s + d);
@@ -269,7 +272,7 @@ ED.Tube.prototype.draw = function(_point) {
 			ctx.lineTo(160 * s, 230 * s + d);
 			ctx.bezierCurveTo(120 * s, 250 * s + d, -120 * s, 250 * s + d, -160 * s, 230 * s + d);
 			break;
-			
+
 		case 'Baerveldt 103-350':
 			// Plate
 			ctx.moveTo(0, 230 * s + d);
@@ -286,12 +289,12 @@ ED.Tube.prototype.draw = function(_point) {
 			ctx.lineTo(160 * s, 230 * s + d);
 			ctx.bezierCurveTo(120 * s, 250 * s + d, -120 * s, 250 * s + d, -160 * s, 230 * s + d);
 			break;
-						
+
 		case 'Molteno Single':
 			// Plate
 			ctx.arc(0, d, 310 * s, 0, Math.PI * 2, true);
 			break;
-			
+
 		case 'Molteno 8mm':
 			// Plate
 			ctx.arc(0, d + 30, 250 * s, 0, Math.PI * 2, true);
@@ -344,9 +347,9 @@ ED.Tube.prototype.draw = function(_point) {
 				ctx.moveTo(-30 * s, 250 * s + d);
 				ctx.lineTo(-30 * s, 290 * s + d);
 				ctx.moveTo(30 * s, 250 * s + d);
-				ctx.lineTo(30 * s, 290 * s + d);			
+				ctx.lineTo(30 * s, 290 * s + d);
 				break;
-				
+
 			case 'Ahmed S2':
 				// Trapezoid mechanism
 				ctx.beginPath()
@@ -365,9 +368,9 @@ ED.Tube.prototype.draw = function(_point) {
 				ctx.lineTo(+280 * s, 0 * s + d);
 				ctx.lineWidth = 8;
 				ctx.strokeStyle = "rgba(250,250,250,0.7)";
-				ctx.stroke();		
+				ctx.stroke();
 				break;
-				
+
 			case 'Ahmed S3':
 				// Trapezoid mechanism
 				ctx.beginPath()
@@ -378,9 +381,9 @@ ED.Tube.prototype.draw = function(_point) {
 				ctx.lineTo(-200 * s, 0 * s + d);
 				ctx.closePath();
 				ctx.fillStyle = "rgba(250,250,250,0.7)";
-				ctx.fill();	
+				ctx.fill();
 				break;
-											
+
 			case 'Baerveldt 103-250':
 				// Spots
  				this.drawSpot(ctx, -120 * s, 20 * s + d, 10, "rgba(150,150,150,0.5)");
@@ -395,7 +398,7 @@ ED.Tube.prototype.draw = function(_point) {
 				ctx.strokeStyle = "rgba(150,150,150,0.5)";
 				ctx.stroke();
 				break;
-											
+
 			case 'Baerveldt 101-350':
 				// Spots
  				this.drawSpot(ctx, -120 * s, 20 * s + d, 10, "rgba(150,150,150,0.5)");
@@ -410,7 +413,7 @@ ED.Tube.prototype.draw = function(_point) {
 				ctx.strokeStyle = "rgba(150,150,150,0.5)";
 				ctx.stroke();
 				break;
-											
+
 			case 'Baerveldt 103-350':
 				// Spots
  				this.drawSpot(ctx, -120 * s, 20 * s + d, 10, "rgba(150,150,150,0.5)");
@@ -425,8 +428,8 @@ ED.Tube.prototype.draw = function(_point) {
 				ctx.strokeStyle = "rgba(150,150,150,0.5)";
 				ctx.stroke();
 				break;
-												
-		case 'Molteno Single':				
+
+		case 'Molteno Single':
 				// Inner ring
 				ctx.beginPath();
 				ctx.arc(0, d, 250 * s, 0, Math.PI * 2, true);
@@ -438,8 +441,8 @@ ED.Tube.prototype.draw = function(_point) {
 				this.drawSpot(ctx, 200 * s, -200 * s + d, 5, "rgba(255,255,255,1)");
 				this.drawSpot(ctx, 200 * s, 200 * s + d, 5, "rgba(255,255,255,1)");
 				break;
-				
-		case 'Molteno 8mm':				
+
+		case 'Molteno 8mm':
 				// Inner ring
 				ctx.beginPath();
 				ctx.arc(0, d + 30, 200 * s, 0, Math.PI * 2, true);
@@ -458,12 +461,12 @@ ED.Tube.prototype.draw = function(_point) {
 		this.bezierArray['cp1'] = new ED.Point(0, 420 * s + d);
 		this.bezierArray['cp2'] = new ED.Point(this.apexX * 1.5, this.apexY + ((290 * s + d) - this.apexY) * 0.5);
 		this.bezierArray['ep'] = new ED.Point(this.apexX, this.apexY);
-		
+
 		ctx.beginPath();
 		ctx.moveTo(0, 290 * s + d);
-		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);		
+		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);
  		ctx.bezierCurveTo(this.bezierArray['cp1'].x, this.bezierArray['cp1'].y, this.bezierArray['cp2'].x, this.bezierArray['cp2'].y, this.bezierArray['ep'].x, this.bezierArray['ep'].y);
-		
+
 		// Simulate tube with gray line and white narrower line
 		ctx.strokeStyle = "rgba(150,150,150,0.5)";
 		ctx.lineWidth = 20;
@@ -478,7 +481,7 @@ ED.Tube.prototype.draw = function(_point) {
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }

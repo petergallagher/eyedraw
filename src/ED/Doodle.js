@@ -888,12 +888,19 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value, _trim) {
 
 			case 'bool':
 
-				// Event handler detects check box type and returns checked attribute
-				if (_value == 'true' || _value == 'false') {
-					// Convert to string for compatibility with setParameterFromString method
-					value = _value;
-					valid = true;
+				switch(_value) {
+					// Event handler detects check box type and returns checked attribute
+					case 'true':
+					case 'false':
+					// Actual bool values
+					case true:
+					case false:
+						// Convert to string for compatibility with setParameterFromString method
+						value = _value.toString();
+						valid = true;
+					break;
 				}
+
 				break;
 
 			case 'colourString':
@@ -1004,17 +1011,20 @@ ED.Doodle.prototype.showControlValidationMsg = function(_parameter, _valid) {
 
 	var elementId = this.parameterControlElementId(_parameter);
 	var label = document.querySelector('[for='+elementId+']');
-	var msg = label.querySelector('.validation-msg');
 
-	if (_valid) {
-		if (msg) msg.parentNode.removeChild(msg);
-	} else {
-		if (!msg) {
-			msg = document.createElement('span');
-			label.appendChild(msg);
-			msg.classList.add('validation-msg');
+	if (label) {
+		var msg = label.querySelector('.validation-msg');
+
+		if (_valid) {
+			if (msg) msg.parentNode.removeChild(msg);
+		} else {
+			if (!msg) {
+				msg = document.createElement('span');
+				label.appendChild(msg);
+				msg.classList.add('validation-msg');
+			}
+			msg.textContent = '*';
 		}
-		msg.textContent = '*';
 	}
 }
 

@@ -336,6 +336,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	var toImage = false;
 	var globalScaleFactor = 1;
 	var toggleScaleFactor = 0;
+	var doodleParameterDefaults = {};
 
 	this.graphicsPath = 'assets/img';
 	this.scaleOn = 'height';
@@ -349,6 +350,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		if (_options['scaleOn']) this.scaleOn = _options['scaleOn'];
 		if (_options['scale']) globalScaleFactor = _options['scale'];
 		if (_options['toggleScale']) toggleScaleFactor = _options['toggleScale'];
+		if (_options['doodleParameterDefaults']) doodleParameterDefaults = _options['doodleParameterDefaults'];
 	}
 
 	// Initialise properties
@@ -377,6 +379,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.globalScaleFactor = globalScaleFactor;
 	this.toggleScaleFactor = toggleScaleFactor;
 	this.origScaleLevel = globalScaleFactor;
+	this.doodleParameterDefaults = doodleParameterDefaults;
 	this.scrollValue = 0;
 	this.lastDoodleId = 0;
 	this.isActive = false;
@@ -2240,6 +2243,11 @@ ED.Drawing.prototype.isReady = function() {
  * @returns {Doodle} The newly added doodle
  */
 ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _parameterBindings) {
+
+	if (!_parameterDefaults && this.doodleParameterDefaults && this.doodleParameterDefaults[_className]) {
+		_parameterDefaults = this.doodleParameterDefaults[_className];
+	}
+
 	// Set flag to indicate whether a doodle of this className already exists
 	var doodleExists = this.hasDoodleOfClass(_className);
 
@@ -4111,12 +4119,19 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value, _trim) {
 
 			case 'bool':
 
-				// Event handler detects check box type and returns checked attribute
-				if (_value == 'true' || _value == 'false') {
-					// Convert to string for compatibility with setParameterFromString method
-					value = _value;
-					valid = true;
+				switch(_value) {
+					// Event handler detects check box type and returns checked attribute
+					case 'true':
+					case 'false':
+					// Actual bool values
+					case true:
+					case false:
+						// Convert to string for compatibility with setParameterFromString method
+						value = _value.toString();
+						valid = true;
+					break;
 				}
+
 				break;
 
 			case 'colourString':
@@ -4227,17 +4242,20 @@ ED.Doodle.prototype.showControlValidationMsg = function(_parameter, _valid) {
 
 	var elementId = this.parameterControlElementId(_parameter);
 	var label = document.querySelector('[for='+elementId+']');
-	var msg = label.querySelector('.validation-msg');
 
-	if (_valid) {
-		if (msg) msg.parentNode.removeChild(msg);
-	} else {
-		if (!msg) {
-			msg = document.createElement('span');
-			label.appendChild(msg);
-			msg.classList.add('validation-msg');
+	if (label) {
+		var msg = label.querySelector('.validation-msg');
+
+		if (_valid) {
+			if (msg) msg.parentNode.removeChild(msg);
+		} else {
+			if (!msg) {
+				msg = document.createElement('span');
+				label.appendChild(msg);
+				msg.classList.add('validation-msg');
+			}
+			msg.textContent = '*';
 		}
-		msg.textContent = '*';
 	}
 }
 
@@ -5999,7 +6017,8 @@ ED.Controller = (function() {
 			toImage: this.properties.toImage,
 			graphicsPath: this.properties.graphicsPath,
 			scale: this.properties.scale,
-			toggleScale: this.properties.toggleScale
+			toggleScale: this.properties.toggleScale,
+			doodleParameterDefaults: this.properties.doodleParameterDefaults
 		};
 
 		var drawing = new ED.Drawing(
@@ -8019,7 +8038,7 @@ ED.Views.Toolbar.Main = (function() {
 
 	return MainToolbar;
 }());
-/*! Generated on 25/7/2014 */
+/*! Generated on 28/7/2014 */
 ED.scriptTemplates = {
   "doodle-popup": "\n\n\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t{{#desc}}\n\t\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t\t</a>\n\t\t\t{{/desc}}\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t{{#doodle.isDeletable}}\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t{{/doodle.isDeletable}}\n\t\t</li>\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
 };
@@ -14279,6 +14298,9 @@ ED.ACMaintainer = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ACMaintainer";
 
+	// Set required scale
+	this.requiredScale = 0.8;
+
 	// Private parameters
 	this.limbus = -400;
 
@@ -14309,7 +14331,7 @@ ED.ACMaintainer.prototype.setPropertyDefaults = function() {
  */
 ED.ACMaintainer.prototype.setParameterDefaults = function() {
 	this.setRotationWithDisplacements(180, 90);
-	
+
 	// Position over SidePort if present
 	var doodle = this.drawing.lastDoodleOfClass("SidePort");
 	if (doodle) {
@@ -16019,7 +16041,7 @@ ED.AntSeg.prototype.description = function() {
 
 	// PXE
 	if (this.pxe) returnValue += "pseudoexfoliation, ";
-	
+
 	// Empty report so far
 	if (returnValue.length == 0 && this.drawing.doodleArray.length == 1) {
 		// Is lens present and normal?
@@ -41025,16 +41047,19 @@ ED.Tube = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Tube";
 
+	// Set required scale
+	this.requiredScale = 0.72;
+
 	// Derived parameters
 	this.type = 'Baerveldt 103-250';
 	this.platePosition = 'STQ';
-	
+
 	// Other Parameters
 	this.bezierArray = new Array();
 
 	// Saved parameters
 	this.savedParameterArray = ['rotation', 'apexY', 'type'];
-	
+
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'type':'Type'};
 
@@ -41182,7 +41207,7 @@ ED.Tube.prototype.draw = function(_point) {
 
 	// Vertical shift
 	var d = -740;
-	
+
 	switch (this.type) {
 		case 'Ahmed FP7':
 			// Plate
@@ -41215,7 +41240,7 @@ ED.Tube.prototype.draw = function(_point) {
 			ctx.lineTo(160 * s, 230 * s + d);
 			ctx.bezierCurveTo(120 * s, 250 * s + d, -120 * s, 250 * s + d, -160 * s, 230 * s + d);
 			break;
-			
+
 		case 'Ahmed S3':
 			// Plate
 			ctx.moveTo(-100 * s, 230 * s + d);
@@ -41225,7 +41250,7 @@ ED.Tube.prototype.draw = function(_point) {
 			ctx.lineTo(-100 * s, -230 * s + d);
 			ctx.lineTo(-200 * s, 0 * s + d);
 			ctx.lineTo(-100 * s, 230 * s + d);
-				
+
 			// Connection flange
 			ctx.moveTo(-100 * s, 230 * s + d);
 			ctx.lineTo(-100 * s, 290 * s + d);
@@ -41249,7 +41274,7 @@ ED.Tube.prototype.draw = function(_point) {
 			ctx.lineTo(160 * s, 230 * s + d);
 			ctx.bezierCurveTo(120 * s, 250 * s + d, -120 * s, 250 * s + d, -160 * s, 230 * s + d);
 			break;
-			
+
 		case 'Baerveldt 101-350':
 			// Plate
 			ctx.moveTo(0, 230 * s + d);
@@ -41266,7 +41291,7 @@ ED.Tube.prototype.draw = function(_point) {
 			ctx.lineTo(160 * s, 230 * s + d);
 			ctx.bezierCurveTo(120 * s, 250 * s + d, -120 * s, 250 * s + d, -160 * s, 230 * s + d);
 			break;
-			
+
 		case 'Baerveldt 103-350':
 			// Plate
 			ctx.moveTo(0, 230 * s + d);
@@ -41283,12 +41308,12 @@ ED.Tube.prototype.draw = function(_point) {
 			ctx.lineTo(160 * s, 230 * s + d);
 			ctx.bezierCurveTo(120 * s, 250 * s + d, -120 * s, 250 * s + d, -160 * s, 230 * s + d);
 			break;
-						
+
 		case 'Molteno Single':
 			// Plate
 			ctx.arc(0, d, 310 * s, 0, Math.PI * 2, true);
 			break;
-			
+
 		case 'Molteno 8mm':
 			// Plate
 			ctx.arc(0, d + 30, 250 * s, 0, Math.PI * 2, true);
@@ -41341,9 +41366,9 @@ ED.Tube.prototype.draw = function(_point) {
 				ctx.moveTo(-30 * s, 250 * s + d);
 				ctx.lineTo(-30 * s, 290 * s + d);
 				ctx.moveTo(30 * s, 250 * s + d);
-				ctx.lineTo(30 * s, 290 * s + d);			
+				ctx.lineTo(30 * s, 290 * s + d);
 				break;
-				
+
 			case 'Ahmed S2':
 				// Trapezoid mechanism
 				ctx.beginPath()
@@ -41362,9 +41387,9 @@ ED.Tube.prototype.draw = function(_point) {
 				ctx.lineTo(+280 * s, 0 * s + d);
 				ctx.lineWidth = 8;
 				ctx.strokeStyle = "rgba(250,250,250,0.7)";
-				ctx.stroke();		
+				ctx.stroke();
 				break;
-				
+
 			case 'Ahmed S3':
 				// Trapezoid mechanism
 				ctx.beginPath()
@@ -41375,9 +41400,9 @@ ED.Tube.prototype.draw = function(_point) {
 				ctx.lineTo(-200 * s, 0 * s + d);
 				ctx.closePath();
 				ctx.fillStyle = "rgba(250,250,250,0.7)";
-				ctx.fill();	
+				ctx.fill();
 				break;
-											
+
 			case 'Baerveldt 103-250':
 				// Spots
  				this.drawSpot(ctx, -120 * s, 20 * s + d, 10, "rgba(150,150,150,0.5)");
@@ -41392,7 +41417,7 @@ ED.Tube.prototype.draw = function(_point) {
 				ctx.strokeStyle = "rgba(150,150,150,0.5)";
 				ctx.stroke();
 				break;
-											
+
 			case 'Baerveldt 101-350':
 				// Spots
  				this.drawSpot(ctx, -120 * s, 20 * s + d, 10, "rgba(150,150,150,0.5)");
@@ -41407,7 +41432,7 @@ ED.Tube.prototype.draw = function(_point) {
 				ctx.strokeStyle = "rgba(150,150,150,0.5)";
 				ctx.stroke();
 				break;
-											
+
 			case 'Baerveldt 103-350':
 				// Spots
  				this.drawSpot(ctx, -120 * s, 20 * s + d, 10, "rgba(150,150,150,0.5)");
@@ -41422,8 +41447,8 @@ ED.Tube.prototype.draw = function(_point) {
 				ctx.strokeStyle = "rgba(150,150,150,0.5)";
 				ctx.stroke();
 				break;
-												
-		case 'Molteno Single':				
+
+		case 'Molteno Single':
 				// Inner ring
 				ctx.beginPath();
 				ctx.arc(0, d, 250 * s, 0, Math.PI * 2, true);
@@ -41435,8 +41460,8 @@ ED.Tube.prototype.draw = function(_point) {
 				this.drawSpot(ctx, 200 * s, -200 * s + d, 5, "rgba(255,255,255,1)");
 				this.drawSpot(ctx, 200 * s, 200 * s + d, 5, "rgba(255,255,255,1)");
 				break;
-				
-		case 'Molteno 8mm':				
+
+		case 'Molteno 8mm':
 				// Inner ring
 				ctx.beginPath();
 				ctx.arc(0, d + 30, 200 * s, 0, Math.PI * 2, true);
@@ -41455,12 +41480,12 @@ ED.Tube.prototype.draw = function(_point) {
 		this.bezierArray['cp1'] = new ED.Point(0, 420 * s + d);
 		this.bezierArray['cp2'] = new ED.Point(this.apexX * 1.5, this.apexY + ((290 * s + d) - this.apexY) * 0.5);
 		this.bezierArray['ep'] = new ED.Point(this.apexX, this.apexY);
-		
+
 		ctx.beginPath();
 		ctx.moveTo(0, 290 * s + d);
-		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);		
+		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);
  		ctx.bezierCurveTo(this.bezierArray['cp1'].x, this.bezierArray['cp1'].y, this.bezierArray['cp2'].x, this.bezierArray['cp2'].y, this.bezierArray['ep'].x, this.bezierArray['ep'].y);
-		
+
 		// Simulate tube with gray line and white narrower line
 		ctx.strokeStyle = "rgba(150,150,150,0.5)";
 		ctx.lineWidth = 20;
@@ -41475,7 +41500,7 @@ ED.Tube.prototype.draw = function(_point) {
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }

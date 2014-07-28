@@ -22,6 +22,7 @@
 	</script>
 	<!-- End loading in eyedraw scripts -->
 
+
 	<style type="text/css">
 	.container.main {
 		width: 338px;
@@ -33,7 +34,7 @@
 <body>
 	<div class="container main" role="main">
 
-		<p>This example shows how the drawing will automatically scale when adding or removing doodles.</p>
+		<p>This example shows how to init an eyedraw.</p>
 
 		<!-- EYEDRAW WIDGET START -->
 		<div class="ed-widget" id="eyedrawwidget_example">
@@ -44,15 +45,81 @@
 				<!-- PANEL START -->
 				<ul class="ed-toolbar-panel ed-main-toolbar">
 					<li>
-						<a class="ed-button" href="#" data-function="addDoodle" data-arg="Tube">
-							<span class="icon-ed-Tube"></span>
-							<span class="label">Drainage tube</span>
-						</a>
-					</li>
-					<li>
 						<a class="ed-button" href="#" data-function="addDoodle" data-arg="NuclearCataract">
 							<span class="icon-ed-NuclearCataract"></span>
 							<span class="label">Nuclear cataract</span>
+						</a>
+					</li>
+					<li>
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="CorticalCataract">
+							<span class="icon-ed-CorticalCataract"></span>
+							<span class="label">Cortical cataract</span>
+						</a>
+					</li>
+					<li>
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="PostSubcapCataract">
+							<span class="icon-ed-PostSubcapCataract"></span>
+							<span class="label">Posterior subcapsular cataract</span>
+						</a>
+					</li>
+					<li>
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="PCIOL">
+							<span class="icon-ed-PCIOL"></span>
+							<span class="label">Posterior chamber IOL</span>
+						</a>
+					</li>
+					<li>
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="ACIOL">
+							<span class="icon-ed-ACIOL"></span>
+							<span class="label">Anterior chamber IOL</span>
+						</a>
+					</li>
+					<li>
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="Bleb">
+							<span class="icon-ed-Bleb"></span>
+							<span class="label">Trabeculectomy bleb</span>
+						</a>
+					</li>
+					<li>
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="PI">
+							<span class="icon-ed-PI"></span>
+							<span class="label">Peripheral iridectomy</span>
+						</a>
+					</li>
+					<li>
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="Fuchs">
+							<span class="icon-ed-Fuchs"></span>
+							<span class="label">Fuchs endothelial dystrophy</span>
+						</a>
+					</li>
+					<li>
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="RK">
+							<span class="icon-ed-RK"></span>
+							<span class="label">Radial keratotomy</span>
+						</a>
+					</li>
+					<li>
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="LasikFlap">
+							<span class="icon-ed-LasikFlap"></span>
+							<span class="label">LASIK flap</span>
+						</a>
+					</li>
+					<li>
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="CornealScar">
+							<span class="icon-ed-CornealScar"></span>
+							<span class="label">Corneal scar</span>
+						</a>
+					</li>
+					<li>
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="SectorIridectomy">
+							<span class="icon-ed-SectorIridectomy"></span>
+							<span class="label">Sector iridectomy</span>
+						</a>
+					</li>
+					<li>
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="PosteriorSynechia">
+							<span class="icon-ed-PosteriorSynechia"></span>
+							<span class="label">Posterior synechia</span>
 						</a>
 					</li>
 				</ul>
@@ -129,14 +196,16 @@
 					[
 						"AntSeg"
 					]
-				],
-				[
-					"deselectDoodles",
-					[]
 				]
 			],
 			onDoodlesLoadedCommandArray: [],
 			bindingArray: {},
+			doodleParameterDefaults: {
+				'AntSeg': {
+					colour: 'Green',
+					isDeletable: true
+				}
+			},
 			syncArray: {},
 			listenerArray: [],
 			offsetX: 0,

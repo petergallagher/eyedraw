@@ -76,6 +76,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	var toImage = false;
 	var globalScaleFactor = 1;
 	var toggleScaleFactor = 0;
+	var doodleParameterDefaults = {};
 
 	this.graphicsPath = 'assets/img';
 	this.scaleOn = 'height';
@@ -89,6 +90,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		if (_options['scaleOn']) this.scaleOn = _options['scaleOn'];
 		if (_options['scale']) globalScaleFactor = _options['scale'];
 		if (_options['toggleScale']) toggleScaleFactor = _options['toggleScale'];
+		if (_options['doodleParameterDefaults']) doodleParameterDefaults = _options['doodleParameterDefaults'];
 	}
 
 	// Initialise properties
@@ -117,6 +119,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.globalScaleFactor = globalScaleFactor;
 	this.toggleScaleFactor = toggleScaleFactor;
 	this.origScaleLevel = globalScaleFactor;
+	this.doodleParameterDefaults = doodleParameterDefaults;
 	this.scrollValue = 0;
 	this.lastDoodleId = 0;
 	this.isActive = false;
@@ -1980,6 +1983,11 @@ ED.Drawing.prototype.isReady = function() {
  * @returns {Doodle} The newly added doodle
  */
 ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _parameterBindings) {
+
+	if (!_parameterDefaults && this.doodleParameterDefaults && this.doodleParameterDefaults[_className]) {
+		_parameterDefaults = this.doodleParameterDefaults[_className];
+	}
+
 	// Set flag to indicate whether a doodle of this className already exists
 	var doodleExists = this.hasDoodleOfClass(_className);
 

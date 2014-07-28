@@ -28,6 +28,9 @@ ED.ACMaintainer = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ACMaintainer";
 
+	// Set required scale
+	this.requiredScale = 0.8;
+
 	// Private parameters
 	this.limbus = -400;
 
@@ -58,7 +61,7 @@ ED.ACMaintainer.prototype.setPropertyDefaults = function() {
  */
 ED.ACMaintainer.prototype.setParameterDefaults = function() {
 	this.setRotationWithDisplacements(180, 90);
-	
+
 	// Position over SidePort if present
 	var doodle = this.drawing.lastDoodleOfClass("SidePort");
 	if (doodle) {
