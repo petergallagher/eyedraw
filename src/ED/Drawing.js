@@ -76,6 +76,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	var toImage = false;
 	var globalScaleFactor = 1;
 	var toggleScaleFactor = 0;
+	var doodleParameterDefaults = {};
 
 	this.graphicsPath = 'assets/img';
 	this.scaleOn = 'height';
@@ -89,6 +90,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		if (_options['scaleOn']) this.scaleOn = _options['scaleOn'];
 		if (_options['scale']) globalScaleFactor = _options['scale'];
 		if (_options['toggleScale']) toggleScaleFactor = _options['toggleScale'];
+		if (_options['doodleParameterDefaults']) doodleParameterDefaults = _options['doodleParameterDefaults'];
 	}
 
 	// Initialise properties
@@ -117,6 +119,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.globalScaleFactor = globalScaleFactor;
 	this.toggleScaleFactor = toggleScaleFactor;
 	this.origScaleLevel = globalScaleFactor;
+	this.doodleParameterDefaults = doodleParameterDefaults;
 	this.scrollValue = 0;
 	this.lastDoodleId = 0;
 	this.isActive = false;
@@ -504,6 +507,7 @@ ED.Drawing.prototype.loadDoodles = function(_id) {
  * @param {Set} _doodleSet Set of doodles from server
  */
 ED.Drawing.prototype.load = function(_doodleSet) {
+
 	// Iterate through set of doodles and load into doodle array
 	for (var i = 0; i < _doodleSet.length; i++) {
 		// Check that class definition exists, otherwise skip it
@@ -515,12 +519,28 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 		// Instantiate a new doodle object with parameters from doodle set
 		this.doodleArray[i] = new ED[_doodleSet[i].subclass](this, _doodleSet[i]);
 		this.doodleArray[i].id = i;
+
+		// Get specified parameter defaults
+		var parameterDefaults = {};
+		if (this.doodleParameterDefaults && this.doodleParameterDefaults[this.doodleArray[i].className]) {
+			parameterDefaults = this.doodleParameterDefaults[this.doodleArray[i].className];
+		}
+		// Don't set params for values that already exist
+		for(var param in parameterDefaults) {
+			if (param in _doodleSet[i]) {
+				delete parameterDefaults[param];
+			}
+		}
+		this.setDoodleParameters(this.doodleArray[i], parameterDefaults);
 	}
 
 	// Sort array by order (puts back doodle first)
 	this.doodleArray.sort(function(a, b) {
 		return a.order - b.order
 	});
+
+	// Set the drawing scale
+	this.setScaleFromDoodles();
 }
 
 /**
@@ -1649,6 +1669,8 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle) {
 			this.doodleArray[i].order = i;
 		}
 
+		this.setScaleFromDoodles();
+
 		// Refresh canvas
 		this.repaint();
 
@@ -1698,12 +1720,12 @@ ED.Drawing.prototype.resetEyedraw = function() {
  * @param  {Number} level     Scale level.
  * @param  {String} eventName Event name to notify.
  */
-ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level) {
+ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(_level) {
 
-	this.globalScaleFactor = level;
+	this.globalScaleFactor = _level;
 
 	this.doodleArray.forEach(function(doodle) {
-		doodle.setScaleLevel(level);
+		doodle.setScaleLevel(_level);
 	});
 
 	this.repaint();
@@ -1711,11 +1733,37 @@ ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level) {
 
 /**
  * This should be called only once the drawing is ready.
- * @param {[type]} level [description]
+ * @param {Number} level The scale level
+ * @param {Boolean} _validateLevel If true, the level will not be applied if
+ * the current level is less than the specified level.
  */
-ED.Drawing.prototype.setScaleLevel = function(level) {
-	this.setScaleForDrawingAndDoodles(level);
+ED.Drawing.prototype.setScaleLevel = function(_level, _validateLevel) {
+	if (_validateLevel && this.getLowestDoodleScaleLevel() < _level) {
+		return;
+	}
+	this.setScaleForDrawingAndDoodles(_level);
 	this.notifyZoomLevel();
+};
+
+/**
+ * Sets the drawing scale to be the lowest from all added doodles.
+ */
+ED.Drawing.prototype.setScaleFromDoodles = function() {
+	var level = this.getLowestDoodleScaleLevel();
+	this.setScaleLevel(level);
+};
+
+ED.Drawing.prototype.getLowestDoodleScaleLevel = function() {
+
+	var lowestLevel = this.origScaleLevel;
+
+	this.doodleArray.forEach(function(doodle) {
+		if (doodle.requiredScale && +doodle.requiredScale < lowestLevel) {
+			lowestLevel = doodle.requiredScale;
+		}
+	});
+
+	return lowestLevel;
 };
 
 /**
@@ -1948,6 +1996,11 @@ ED.Drawing.prototype.isReady = function() {
  * @returns {Doodle} The newly added doodle
  */
 ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _parameterBindings) {
+
+	if (!_parameterDefaults && this.doodleParameterDefaults && this.doodleParameterDefaults[_className]) {
+		_parameterDefaults = this.doodleParameterDefaults[_className];
+	}
+
 	// Set flag to indicate whether a doodle of this className already exists
 	var doodleExists = this.hasDoodleOfClass(_className);
 
@@ -1979,17 +2032,8 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 			this.doodleArray[i].isSelected = false;
 		}
 
-		// Set parameters for this doodle
-		if (typeof(_parameterDefaults) != 'undefined') {
-			for (var key in _parameterDefaults) {
-				var res = newDoodle.validateParameter(key, _parameterDefaults[key]);
-				if (res.valid) {
-					newDoodle.setParameterFromString(key, res.value);
-				} else {
-					ED.errorHandler('ED.Drawing', 'addDoodle', 'ParameterDefaults array contains an invalid value for parameter ' + key);
-				}
-			}
-		}
+		// Set params from defaults
+		this.setDoodleParameters(newDoodle, _parameterDefaults);
 
 		// New doodles are selected by default
 		this.selectedDoodle = newDoodle;
@@ -2087,6 +2131,10 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 			this.repaint();
 		}
 
+		if (newDoodle.requiredScale) {
+			this.setScaleLevel(newDoodle.requiredScale, true);
+		}
+
 		// Notify
 		this.notify("doodleAdded", newDoodle);
 
@@ -2100,6 +2148,24 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 		return null;
 	}
 }
+
+/**
+ * Set doodle params
+ * @param {ED.Doodle} _doodle            A doodle instance
+ * @param {Object} _parameterDefaults Parameter keys/values
+ */
+ED.Drawing.prototype.setDoodleParameters = function(_doodle, _parameterDefaults) {
+	if (typeof(_parameterDefaults) != 'undefined') {
+		for (var key in _parameterDefaults) {
+			var res = _doodle.validateParameter(key, _parameterDefaults[key]);
+			if (res.valid) {
+				_doodle.setParameterFromString(key, res.value);
+			} else {
+				ED.errorHandler('ED.Drawing', 'setDoodleParameters', 'ParameterDefaults array contains an invalid value for parameter ' + key);
+			}
+		}
+	}
+};
 
 /**
  * Takes array of bindings, and adds them to the corresponding doodles. Adds an event listener to create a doodle if it does not exist

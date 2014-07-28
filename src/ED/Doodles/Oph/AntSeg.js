@@ -308,7 +308,7 @@ ED.AntSeg.prototype.description = function() {
 
 	// PXE
 	if (this.pxe) returnValue += "pseudoexfoliation, ";
-	
+
 	// Empty report so far
 	if (returnValue.length == 0 && this.drawing.doodleArray.length == 1) {
 		// Is lens present and normal?

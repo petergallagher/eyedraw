@@ -74,7 +74,8 @@ ED.Controller = (function() {
 			toImage: this.properties.toImage,
 			graphicsPath: this.properties.graphicsPath,
 			scale: this.properties.scale,
-			toggleScale: this.properties.toggleScale
+			toggleScale: this.properties.toggleScale,
+			doodleParameterDefaults: this.properties.doodleParameterDefaults
 		};
 
 		var drawing = new ED.Drawing(

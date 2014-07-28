@@ -2,24 +2,25 @@
 
 	'use strict';
 
-	function createDrawing() {
+	function createDrawing(opts, data) {
 
-		var dom = createDOM();
+		var dom = createDOM(data);
 
-		var opts = 	{
+		var opts = 	$.extend({}, {
 			drawingName: 'drawing name',
 			offsetX: 0,
 			offsetY: 0,
 			toImage: false,
 			graphicsPath: '../../assets/img',
 			scale: 1
-		}
+		}, opts);
+
 		return new ED.Drawing(dom.canvas[0], 1, 'idSuffix', true, opts);
 	}
 
 	describe('Drawing', function() {
 
-		after(function() {
+		afterEach(function() {
 			$('.ed-widget').empty().remove();
 		});
 
@@ -227,7 +228,7 @@
 				expect(zoomedData.apexY).to.equal(testData.apexY, 'apexY should match');
 			});
 
-			it('Should save drawing data correctly when the doodle is sized', function() {
+			it('Should save drawing data correctly when the doodle size is changed', function() {
 
 				var drawing = createDrawing();
 
@@ -265,6 +266,100 @@
 				expect(zoomedData.originY).to.equal(testData.originY, 'originY should match');
 				expect(zoomedData.width).to.equal(testData.width, 'width should match');
 				expect(zoomedData.height).to.equal(testData.height, 'height should match');
+			});
+
+			describe('Auto scaling the drawing', function() {
+
+				before(function createDoodles() {
+					ED.TestDoodle1 = function(_drawing, _parameterJSON) {
+						this.className = 'TestDoodle1';
+						this.requiredScale = 0.72;
+						ED.Doodle.call(this, _drawing, _parameterJSON);;
+					}
+					ED.TestDoodle1.prototype = Object.create(ED.Doodle.prototype);
+
+					ED.TestDoodle2 = function(_drawing, _parameterJSON) {
+						this.className = 'TestDoodle2';
+						this.requiredScale = 0.5;
+						ED.Doodle.call(this, _drawing, _parameterJSON);;
+					}
+					ED.TestDoodle2.prototype = Object.create(ED.Doodle.prototype);
+
+					ED.TestDoodle3 = function(_drawing, _parameterJSON) {
+						this.className = 'TestDoodle3';
+						ED.Doodle.call(this, _drawing, _parameterJSON);;
+					}
+					ED.TestDoodle3.prototype = Object.create(ED.Doodle.prototype);
+				});
+
+				after(function deleteDoodles() {
+					delete ED.TestDoodle1;
+					delete ED.TestDoodle2;
+					delete ED.TestDoodle3;
+				});
+
+				it('Should scale the drawing when a doodle is added and removed', function() {
+
+					var drawing = createDrawing({ scale: 0.9 });
+
+					drawing.addDoodle('TestDoodle1');
+
+					expect(drawing.globalScaleFactor).to.equal(0.72,
+						'The drawing scale should match the scale of the added doodle if the doodle has specified a required scale');
+
+					drawing.deleteDoodle(drawing.doodleArray[0]);
+					expect(drawing.globalScaleFactor).to.equal(0.9,
+						'The scale should default to the initial drawing scale if no doodles have been added');
+				});
+
+				it('Should scale the drawing correctly when multiple doodles are added and removed', function() {
+
+					var drawing = createDrawing();
+
+					drawing.addDoodle('TestDoodle2');
+					drawing.addDoodle('TestDoodle1');
+					drawing.addDoodle('TestDoodle3');
+
+					expect(drawing.globalScaleFactor).to.equal(0.5,
+						'The scale should be the lowest of all added doodles');
+
+					drawing.deleteDoodle(drawing.doodleArray[0]); // Remove TestDoodle2
+					expect(drawing.globalScaleFactor).to.equal(0.72,
+						'The scale should be the lowest of all added doodles')
+
+					drawing.deleteDoodle(drawing.doodleArray[1]); // Remove TestDoodle3
+					expect(drawing.globalScaleFactor).to.equal(0.72,
+						'The scale should be the lowest of all added doodles');
+
+					drawing.deleteDoodle(drawing.doodleArray[0]); // Remove TestDoodle1
+					expect(drawing.globalScaleFactor).to.equal(1,
+						'The scale should default to 1 if no doodles have been added');
+				});
+
+				it('Should scale the drawing correctly when loading doodles (eg when in "view/display" mode)', function() {
+
+					var drawing = createDrawing({},[
+						 {
+								"version":1.1,
+								"subclass":"TestDoodle1",
+								"rotation":315,
+								"apexY":-300,
+								"order":1
+						 },
+						 {
+								"version":1.1,
+								"subclass":"TestDoodle2",
+								"rotation":315,
+								"apexY":-300,
+								"order":2
+						 }
+					]);
+
+					drawing.loadDoodles('inputID');
+
+					expect(drawing.globalScaleFactor).to.equal(0.5,
+						'The drawing scale should match the lowest scale of the added doodles');
+				});
 			});
 		});
 	});

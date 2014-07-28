@@ -188,6 +188,11 @@ class OEEyeDrawWidget extends CWidget
 	public $listenerArray = array();
 
 	/**
+	 * Array of doodle parameter default options, eg: array('AntSeg' => array('Colour'=>'Green'))
+	 */
+	public $doodleParameterDefaults = array();
+
+	/**
 	 * Optional inline styling for the canvas element
 	 * @var string
 	 */
@@ -403,6 +408,7 @@ class OEEyeDrawWidget extends CWidget
 			'inputId'=>$this->inputId,
 			'onReadyCommandArray'=>$this->onReadyCommandArray,
 			'onDoodlesLoadedCommandArray'=>$this->onDoodlesLoadedCommandArray,
+			'doodleParameterDefaults'=>$this->doodleParameterDefaults,
 			'bindingArray'=>$this->bindingArray,
 			'deleteValueArray'=>$this->deleteValueArray,
 			'syncArray'=>$this->syncArray,
