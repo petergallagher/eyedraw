@@ -55,6 +55,7 @@ ED.ViewObscured.prototype.setHandles = function() {
 ED.ViewObscured.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = false;
+	this.isUnique = true;
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, +0);
