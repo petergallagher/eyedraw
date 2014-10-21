@@ -1,1 +1,883 @@
-My girhub page
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Eyedraw Documentation</title>
+
+
+    <!-- EyeDraw CSS style sheet -->
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/oe-eyedraw.css" type="text/css" media="screen" />
+
+    <!-- Entire eyedraw lib -->
+    <script src="assets/js/oe-eyedraw.js" type="text/javascript"></script>
+
+	</head>
+
+	<body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h1>Documentation</h1>
+          <h2>Table of Contents</h2>
+          <ol>
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#basic-usage">Basic usage</a></li>
+            <li><a href="#initialisation ">Initialisation of doodle parameters</a></li>          
+            <li><a href="#binding-to-html">Binding to HTML elements</a></li>          
+            <li><a href="#binding-to-deletable">Binding to deletable doodles</a></li>         
+            <li><a href="#synchronisation">Synchronisation</a></li>         
+            <li><a href="#notifications">Notifications</a></li>        
+            <li><a href="#eyedraw-widget">EyeDraw widget</a></li>          
+            <li><a href="#widget-usage">Basic Usage</a></li>          
+            <li><a href="#widget-initialisation">Initialisation</a></li>          
+            <li><a href="#widget-bindings">Bindings</a></li>          
+            <li><a href="#widget-synchronisation">Synchronisation</a></li>          
+            <li><a href="#widget-listeners">Listeners</a></li>
+            <li><a href="#widget-examples">Examples</a></li>
+            <li><a href="#appendix1">Appendix 1</a></li>
+            <li><a href="#appendix-notifications">Notifications</a></li>          
+            <li><a href="#appendix2">Appendix 2</a></li>        
+            <li><a href="#list-of-arguments">List of arguments for the EyeDraw widget</a></li>
+          </ol>
+
+
+
+            <h2 id="introduction">Introduction</h2>
+            <p>This document describes the use of EyeDraw, the OpenEyes drawing package. It describes in detail how to
+            create a drawing on an HTML page using HTML elements and javascript. A companion document describes the
+            EyeDraw widget, which makes the use of EyeDraw in web applications using the Yii framework easier
+            The latest version (2.0) of EyeDraw includes a number of improvements, including a notification system, easier
+            initialisation of parameter values, animation, binding to HTML elements, synchronisation between drawings, and
+            better error reporting.</p>
+
+            <h2>Usage</h2>
+            <p>For most of the sections below, a fully commented and working HTML file is provided in the with a name
+            corresponding to the title of the section</p>
+            
+            <h3 id="basic-usage">Basic usage</h3>
+            <p>An EyeDraw instance can be created using the following code which runs on page load (see the file
+            BasicUsage.html);</p>
+            
+         
+            <pre><code>
+              function init(){
+
+                // Create a drawing linked to the canvas
+                drawingEdit = new ED.Drawing(document.getElementById('canvasEdit'),
+                ED.eye.Right, 'RPS', true, {graphicsPath:"../graphics/"});
+
+                // Initialise drawing
+                drawingEdit.init();
+              }
+            </code></pre>
+
+            <p>There are four mandatory arguments;</p>
+            <ul>
+              <li>canvas: A reference to the canvas element linked to the drawing object</li>
+              <li>eye: right or left eye</li>
+              <li>IDSuffix: A string which uniquely identifies the drawing on the page</li>
+              <li>isEditable: A boolean which specifies whether the user can edit the drawing or not</li>
+              In addition, the constructor accepts an array of optional arguments:
+                  <ul>
+                    <li>offsetX : Offset used to calculate pointer position (default value 0)</li>
+                    <li>offsetY: Offset used to calculate pointer position (default value 0)</li>
+                    <li>toImage: Boolean indicating whether to convert the drawing to an image (default value false)</li>
+                    <li>graphicsPath: Relative path to the folder containing graphics files (default value 'graphics/');</li>
+                  </ul>
+              </li>
+            </ul>
+
+            <p>The above code will create an EyeDraw instance linked to the canvas object, and simple commands can be
+            issued via the ‘drawingEdit variable. However, for more advanced interaction, a controller object should be
+            instantiated using the following command. Place this before the init() call, in order to guarantee that the controller
+            will receive the ‘ready’ notification.</p>
+            
+            <pre><code>
+              // Create a controller object for this drawing
+              var controller = new eyeDrawController(drawingEdit);
+            </code></pre>
+
+            <p>A simple controller is illustrated with the following code.</p>
+            
+            <pre><code>
+              function eyeDrawController(_drawing){
+
+                // Register controller for notifications
+                _drawing.registerForNotifications(this, 'notificationHandler', ['ready']);
+              
+                // Method called for notification
+                this.notificationHandler = function(_messageArray){
+                  switch (_messageArray['eventName']){
+              
+                    // Ready notification
+                    case 'ready':
+                      _drawing.addDoodle('AntSeg');
+                      break;
+                  }
+                }
+              }
+            </code></pre>
+            
+            <p>The controller registers itself with the drawing object, and will then receive notifications to the specified handler
+            function. The specific notifications are listed in the last argument of the registerForNotifications function, and if
+            an empty array is passed, the controller will respond to all notifications. A full list of notifications will be found in
+            Appendix one. In this example, once the images are loaded, a new doodle of the ‘AntSeg’ class is added to the
+            drawing.</p>
+
+            <p>The internal notification handler contains a switch case construct, which in this example will respond only to the
+            ‘ready’ notification, which is issued when all the image files required by EyeDraw for patterned fills, are
+            successfully loaded.</p>
+
+            <h3 id="initialisation">Initialisation of doodle parameters</h3>
+
+            <p>The ‘AntSeg’ doodle has a derived parameter called ‘pupilSize’ which has three possible values (Large,
+            Medium, Small). The initial value (Large) is defined as part of the doodle subclass, but this value can be set by
+            passing an associative array as an optional parameter of the addDoodle function like this:</p>
+
+            <pre><code>
+              _drawing.addDoodle('AntSeg', {pupilSize:'Small'});
+            </code></pre>
+            
+            <p>Any number of parameters (simple or derived) can be set using this mechanism.</p>
+            
+            <h3 id="binding-to-html">Binding to HTML elements</h3>
+            
+            <p>Many real world examples in OpenEyes require that a parameter of a doodle reflect the value of an HTML
+            element, and vice versa. For example, the following text element displays a possible value for the pupilSize
+            parameter.</p>
+
+            <pre><code>
+              &lt;input type="text" id="pupilSizeInput" value="Medium" /&gt;
+
+              <input type="text" id="pupilSizeInput" value="Medium" />
+            </code></pre>
+            
+            <p>Previous versions of EyeDraw required a great deal of glue code to syncronise the value of the parameter and
+            the HTML element, but this can now be achieved using a simple binding, which is an associative array passed
+            as a second optional parameter in the addDoodle command:</p>
+
+            <pre><code>
+              _drawing.addDoodle('AntSeg', {pupilSize:'Small'}, {pupilSize:'pupilSizeInput'});
+            </code></pre>
+            
+            <p>Note that in this example there is a conflict in the initial value of the pupilSize parameter between the initialisation
+            array, and the binding array, since the value of the bound element is set to ‘Medium’. In these circumstances,
+            the binding array always takes precedence, so in this example, the value of the parameter is set to the initial
+            value of the HTML element.</p>
+
+            <p>The binding function also provides animation (if the doodle subclass allows it), so that changing the value of the
+            bound element will result in a change occurring in the diagram with an animation.</p>
+
+            <p>Validation is also built in, so changing the value of the bound element to an invalid value will result in it being
+            changed to a valid one, according to rules which vary with the type of parameter. In this case, the value simply
+            reverts to the value corresponding to the diagram.</p>
+
+            <h3 id="binding-to-deletable">Binding to deletable doodles</h3>
+
+            <p>Sometimes there is a requirement to bind an element to a doodle which is deletable, and therefore might be
+            deleted. The behaviour of the element under these circumstances needs to be defined, and this is done by
+            passing an associative array to the drawing object linking the id of the element with the value corresponding to
+            the absent doodle. For example, the ‘CorticalCataract’ doodle has a parameter indicating severity called
+            ‘grade’, and this can have the value Mild, Moderate, or White, as in the following select element;</p>
+
+            <pre><code>
+
+              &lt;select id="gradeSelect"&gt;
+                &lt;option value="None" selected="true">None&lt;/option&gt;
+                &lt;option value="Mild" >Mild&lt;/option&gt;
+                &lt;option value="Moderate">Moderate&lt;/option&gt;
+                &lt;option value="White">White&lt;/option&gt;
+              &lt;/select&gt;
+
+              <select id="gradeSelect">
+                <option value="None" selected="true">None</option>
+                <option value="Mild" >Mild</option>
+                <option value="Moderate">Moderate</option>
+                <option value="White">White</option>
+              </select>
+            </code></pre>
+            
+            <p>However, an additional option of ‘None’ is also required, corresponding to the absence of the doodle. The
+            binding needs to support the following behaviour;</p>
+            <ul>
+
+              <li>Deleting the doodle should result in the value of the select element being set to ‘None’</li>
+              <li>Setting the select element to a value of ‘None’ should result in the doodle being deleted</li>
+              <li>Setting the select element to a value other than none should create a doodle if one does not exist</li>
+            
+            </ul>
+            <p>All this behaviour is supported by the binding mechanism, though this has to be applied in a different way, to
+            allow for the possibility of the initial conditions having no doodle present (so that the addDoodle method cannot
+            be used to create the binding). An associative array is passed with the key corresponding to the Class name of
+            the doodle to be bound to, and the value being another associative array linking parameters to the id of the
+            bound element.</p>
+            <p>The drawing object needs to know what value of the bound element is associated with a deleted doodle, and
+            this is passed using the addDeleteValues method, which takes an associative array as a parameter, in this case
+            with a single key:value pair linking the element id, and the value to be associated with the deleted doodle:</p>
+            <pre><code>
+              case 'ready':
+                _drawing.addDoodle('AntSeg');
+                _drawing.addBindings({CorticalCataract:{grade:'gradeSelect'}});
+                _drawing.addDeleteValues({gradeSelect:'None'});
+                break;
+            </code></pre>
+
+            <p>The binding should now behave as expected.</p>
+            <h3 id="synchronisation">Synchronisation</h3>
+            <p>Two or more drawings can be set up so that parameters are synchronised between them. First of all, set up two
+            canvas elements by adding the following to the HTML.</p>
+
+         
+            <pre><code>       
+              &lt;canvas id="canvasEdit2" class="ed_canvas_edit" width="300" height="300" tabindex="2"&gt;&lt;/canvas&gt;
+            </code></pre>
+
+
+            <p>Another drawing is instantiated using the following additional line in the init code:</p>
+
+            <pre><code>
+              var drawingEdit2 = new ED.Drawing(document.getElementById('canvasEdit2'),
+              ED.eye.Left, 'LPS', true);
+            </code></pre>
+
+            <p>Remove the binding code and revert to a simple addDoodle command so that an AntSeg doodle is loaded into
+            each drawing</p>
+
+            <pre><code>
+              case 'ready':
+              _drawing.addDoodle('AntSeg');
+              break;
+            </code></pre>
+
+            <p>Synchronisation information is held in an associative array, which should be defined in the controller function as
+            follows. The array is effectively saying to the RPS drawing, “Sync any ‘AntSeg’ doodle with an ‘AntSeg’ doodle
+            in the LPS drawing.</p>
+
+            <pre><code> 
+              var syncArray = new Array();
+              if (_drawing.IDSuffix == 'RPS'){
+                syncArray['LPS'] = {AntSeg:['AntSeg']};
+              }
+            </code></pre>
+
+            <p>The synchronisation itself is handled by a method of the doodle subclass, but also requires code in the controller
+            to iterate through the syncArray and call the appropriate methods. The notification handler is set up to respond
+            to any changes in doodle parameters, by adding the case ‘parameter’. In this example, one drawing is defined
+            as the master and one as the slave, enabling one way synchronisation.</p>
+
+            <pre><code>
+              // Iterate through syncArray
+              for (var idSuffix in syncArray){
+              
+                // Iterate through each specified className
+                for (var className in syncArray[idSuffix]){
+                
+                  // Get array of specified slave doodle class names
+                  var slaveClassNameArray = syncArray[idSuffix][className];
+                  
+                  // Iterate through it,
+                  for (var i = 0; i < slaveClassNameArray.length; i++){
+                  
+                    // Define which drawing is slave
+                    var slaveDrawing = drawingEdit2;
+
+                    // Master doodle
+                    var masterDoodle = _messageArray['object'].doodle;
+                
+                    // Slave doodle (uses first doodle in the drawing matching the className)
+                    
+                    var slaveDoodle = slaveDrawing.firstDoodleOfClass(slaveClassNameArray[i]);
+                
+                    // If master is being driven, both are defined, and slave doodle is set to sync, enact sync for the changed parameter
+                    
+                    if (masterDoodle && slaveDoodle && slaveDoodle.willSync && masterDoodle.drawing.isActive){
+                
+                      // Sync is handled by a method of the slave doodle object
+                      slaveDoodle.syncParameter(_messageArray.object.parameter, masterDoodle[_messageArray.object.parameter]);
+                      
+                      // Update any bindings associated with the slave doodle
+                      slaveDrawing.updateBindings(slaveDoodle);
+                    }
+                  }
+                }
+              }
+            </code></pre>
+
+            <p>Two way synchronisation is achieved by adding a syncArray to the other drawing:</p>
+
+            <pre><code>
+              if (_drawing.IDSuffix == 'LPS'){
+                syncArray['RPS'] = {AntSeg:['AntSeg']};
+              }
+            </code></pre>
+
+            <p>The only other change required is an additional line of code to correctly identify which is the slave drawing:</p>
+
+            <pre><code>
+              var slaveDrawing = idSuffix == 'RPS'?drawingEdit1:drawingEdit2;
+            </code></pre>
+
+            <p>Synchronisation can be switched off by setting the willSync property of the slave doodle to false.</p>
+
+            <h3 id="notifications">Notifications</h3>
+
+            <p>Any object can register to receive notifications from EyeDraw by calling the registerForNotifications method of a
+            drawing object. This takes three arguments;</p>
+
+            <ul>
+              <li>The object to be registered</li>
+              <li>The name of the object’s method to be called with a notification</li>
+              <li>An array containing a list of notifications that the object is interested in</li>
+            </ul>
+
+            <p></p>The following example creates a new object which will respond to a change in the value of a doodle’s parameter
+            and send the contents of the received message to the console.</p>
+            
+            <pre><code>
+              var test = new listener;
+              function listener(_drawing){
+
+                // Register this object for notifications
+                _drawing.registerForNotifications(this, 'handler', ['parameter']);
+              
+                // Function called for notification
+                this.handler = function(_messageArray){
+                  console.log(_messageArray);
+                }
+              }
+            </code></pre>
+
+            <p>The message array consists of three items:</p>
+            <ul>
+              <li>The name of the event</li>
+              <li>The currently selected doodle (or null if none selected)</li>
+              <li>An additional object, the definition of which depends on the event (See Appendix one)</li>
+            </ul>
+
+            <h2 id="eyedraw-widget">EyeDraw widget</h2>
+
+            <h3 id="widget-usage">Basic Usage</h3>
+            
+            <p>EyeDraw has been incorporated into a convenient widget for use within the Yii framework. A basic EyeDraw can
+            be inserted into a view file using the following code:</p>
+
+            <pre><code>
+              <?php
+                $this->widget('application.modules.eyedraw.OEEyeDrawWidget', array(
+                'scriptArray'=>array('ED_AntSeg.js'),
+                'doodleToolBarArray'=>array('AntSeg', 'PhakoIncision'),
+                ));
+              ?>
+            </code></pre>
+            
+            <p>This will allow the user to add and manipulate a couple of doodles, but these will not persist without a couple
+            more arguments being passed. The following two arguments will save the content of the drawing.</p>
+
+            <pre><code>
+              'model'=>$model,
+              'attribute'=>'right_drawing',
+            </code></pre>
+            
+            <p>The attribute should be a field of type TEXT, since the drawing object saves its content in a JSON string of
+            indefinite length.</p>
+
+            <p>If there is more than one drawing on a page, a unique suffix should be passed so that the two drawings can be
+            distinguished. Since some doodles behave differently according to which side they represent, then this can also
+            be passed as an argument:</p>
+
+            <pre><code>
+              'idSuffix'=> 'RPS',
+              'side'=>'R',
+            </code></pre>
+            
+            <p>Default values of canvas size and mode can be overridden using additional arguments.</p>
+
+            <pre><code>
+              'mode'=>'view',
+              'width'=>200,
+              'height'=>200,
+            </code></pre>
+            
+            <p>A full list of arguments and their default values is given in Appendix two.</p>
+            
+            <h3 id="widget-initialisation">Initialisation</h3>
+
+            <p>Initial commands are passed to the widget using the onReadyCommandArray, as in the following example which
+            adds two doodles to the drawing, and then deselects them</p>
+
+            <pre><code>
+              'onReadyCommandArray'=>array(
+                array('addDoodle', array('AntSeg')),
+                array('addDoodle', array('PhakoIncision')),
+                array('deselectDoodles'),
+              ),
+            </code></pre>
+            
+            <p>These commands are only run for new doodles, and not when a drawing is derived from data in the model.
+            The above commands use initial parameter values as defined in the doodle subclass definitions. In order use
+            different values, these can be passed in an additional argument, as in the following example:</p>
+
+            <pre><code>
+              array('addDoodle', array('PhakoIncision', array('incisionType'=>'Section'))),
+            </code></pre>
+            
+            <h3 id="widget-bindings">Bindings</h3>
+            
+            <p>Bindings to HTML elements can be set up by passing a binding array. The following example assumes that
+            there is a field of string type in the model called ‘stringField’, and this is represented on the form in a textField;</p>
+
+            <pre><code>
+              
+              <?php echo $form->labelEx($model,'stringField'); ?>
+              <?php echo $form->textField($model,'stringField'); ?>
+              <?php echo $form->error($model,'stringField'); ?>
+              
+            </code></pre>
+            
+            <p>In this example, the textField will have an id of 'Eyedraw_stringField', assuming the name of the model used for
+            persistent storage is ‘Eyedraw’. The following argument will result in the incisionType parameter of the
+            PhakoIncision doodle being bound to the value of the stringField attribute.</p>
+
+            <pre><code>
+              'bindingArray'=>array(
+                'PhakoIncision'=>array(
+                  'incisionType'=>'Eyedraw_stringField'
+                ),
+              ),
+            </code></pre>
+            
+            <p>In order to ensure coordination of the value of the element to the presence or absence of the doodle, a ‘delete
+            value’ is also passed as an array using the following code.</p>
+
+            <pre><code>
+              'deleteValueArray'=>array(
+                'Eyedraw_stringField'=>'None',
+              ),
+            </code></pre>
+            
+            <p>This last argument will delete the doodle if the value ‘None’ is selected, and will set the value of the element to
+            ‘None’ if the doodle is deleted.</p>
+
+            <h3 id="widget-synchronisation">Synchronisation</h3>
+
+            <p>Synchronisation is achieved by passing a sync array to one or both of two widgets. In the following example, the
+            two widgets have their ‘divWrapper’ property set to false so that both appear next to each other;</p>
+            
+            <pre><code>
+              <?php
+                $this->widget('application.modules.eyedraw.OEEyeDrawWidget', array(
+                  'scriptArray'=>array('ED_General.js'),
+                  'toolbar'=>false,
+                  'model'=>$model,
+                  'attribute'=>'left_drawing',
+                  'onReadyCommandArray'=>array(
+                    array('addDoodle', array('Surgeon')),
+                    array('deselectDoodles'),
+                  ),
+                  'syncArray'=>array(
+                  'RPA'=>array('Surgeon'=>array('PhakoIncision')),
+                ),
+                'idSuffix'=> 'RPS',
+                'side'=>'R',
+                'mode'=>'edit',
+                'width'=>200,
+                'height'=>200,
+                'divWrapper'=>false,
+                ));
+              ?>
+              </code></pre>
+              <pre><code>
+              <?php
+                $this->widget('application.modules.eyedraw.OEEyeDrawWidget', array(
+                  'scriptArray'=>array('ED_AntSeg.js'),
+                  'toolbar'=>false,
+                  'model'=>$model,
+                  'attribute'=>'right_drawing',
+                  'onReadyCommandArray'=>array(
+                    array('addDoodle', array('AntSeg')),
+                    array('addDoodle', array('PhakoIncision')),
+                    array('deselectDoodles'),
+                  ),
+                  'idSuffix'=> 'RPA',
+                  'side'=>'R',
+                  'mode'=>'edit',
+                  'width'=>200,
+                  'height'=>200,
+                  'divWrapper'=>false,
+                ));
+              ?>
+            </code></pre>
+            
+            <p>Two way synchronisation is achieved by adding a similar sync array to the other widget:</p>
+            
+            <pre><code>
+              'syncArray'=>array(
+                'RPS'=>array('PhakoIncision'=>array('Surgeon')),
+              ),
+            </code></pre>
+
+            <p>Although the surgeon widget rotation value can now be driven by the PhakoIncision meridian, it does not
+            respect the validation values and allows intermediate positioning. This may be desirable depending on the exact
+            application, but the behaviour can be adjusted by code within the syncParameter method of the doodle
+            subClass.</p>
+
+            <h3 id="widget-listeners">Listeners</h3>
+
+            <p>Assigning additional listeners to the eyedraw component allows greater complexity to be attached to changes to
+            the doodles. A javascript listener object should be created (in Yii modules that are using EyeDraw, a good
+            location for this is the module.js file). Listeners are described in Notifications above.</p>
+
+            <pre><code>
+              function posteriorListener(_drawing) {
+                this.drawing = _drawing;
+                
+                // register this listener to receive notifications.
+                this.drawing.registerForNotifications(this, 'callBack', ['doodleAdded', 'doodleDeleted', 'parameterChanged']);
+              
+                // define function to receive notifications
+                this.callBack = function (_messageArray) {
+              
+                  // respond to messages/state of the drawing object.
+                }
+              }
+            </code></pre>
+            
+            <p>The OEEyeDrawWidget is initialised as described above, with the additional parameter of listenerArray:</p>
+
+            <pre><code>
+              'listenerArray' => array('posteriorListener'),
+            </code></pre>
+            
+            <h3 id="widget-examples">Examples</h3>
+
+            <p>The following examples illustrate some of the configurations of the widget required for elements in the
+            examination event;</p>
+
+            <pre><code>
+              $this->widget('application.modules.eyedraw2.OEEyeDrawWidget', array(
+                // two rows of doodle buttons
+                'doodleToolBarArray'=>array(
+                  array('NuclearCataract'),
+                  array(‘AntSeg’),
+                ),
+                'scriptArray'=>array('ED_AntSeg.js'),
+                'side'=>'R',
+                'mode'=>'edit',
+                'width'=>200,
+                'height'=>200,
+                'idSuffix'=> 'RPS',
+                'model'=>$model,
+                'attribute'=>'right_drawing',
+                'onReadyCommandArray'=>array(
+                array('addDoodle', array('AntSeg')),
+                array('deselectDoodles'),
+              ),
+              'bindingArray'=>array(
+                'NuclearCataract'=>array(
+                  'grade'=>array('id'=>'Eyedraw_stringField1', 'attribute'=>'ed_val')
+                ),
+              ),
+              'deleteValueArray'=>array(
+                'Eyedraw_stringField1'=>'None',
+              ),
+              ));
+              </code></pre>
+              <pre><code>
+              $this->widget('application.modules.eyedraw2.OEEyeDrawWidget', array(
+                'scriptArray'=>array('ED_AntSeg.js'),
+                'side'=>'R',
+                'mode'=>'edit',
+                'width'=>200,
+                'height'=>200,
+                'idSuffix'=> 'RPS',
+                'model'=>$model,
+                'attribute'=>'right_drawing',
+                'onReadyCommandArray'=>array(
+                  array('addDoodle', array('TrialFrame')),
+                  array('addDoodle', array('TrialLens')),
+                  array('deselectDoodles'),
+                ),
+                'bindingArray'=>array(
+                'TrialLens'=>array(
+                'axis'=>array('id'=>'Eyedraw_stringField1')
+                ),
+              ),
+              'deleteValueArray'=>array(
+              'Eyedraw_stringField1'=>'None',
+              ),
+              ));
+              </code></pre>
+              <pre><code>
+              $this->widget('application.modules.eyedraw2.OEEyeDrawWidget', array(
+                'doodleToolBarArray'=>array('AngleNV', 'AntSynech', 'AngleRecession'),
+                'scriptArray'=>array('ED_Glaucoma.js'),
+                'side'=>'R',
+                'mode'=>'edit',
+                'width'=>200,
+                'height'=>200,
+                'idSuffix'=> 'RPS',
+                'model'=>$model,
+                'attribute'=>'right_drawing',
+                'onReadyCommandArray'=>array(
+                  array('addDoodle', array('Gonioscopy')),
+                  array('addDoodle', array('AngleGradeNorth')),
+                  array('addDoodle', array('AngleGradeEast')),
+                  array('addDoodle', array('AngleGradeSouth')),
+                  array('addDoodle', array('AngleGradeWest')),
+                  array('deselectDoodles'),
+                ),
+                'bindingArray'=>array(
+                  'AngleGradeNorth'=>array(
+                    'grade'=>array('id'=>'Eyedraw_stringField1')
+                  ),
+                'AngleGradeEast'=>array(
+                  'grade'=>array('id'=>'Eyedraw_stringField2')
+                ),
+                'AngleGradeSouth'=>array(
+                  'grade'=>array('id'=>'Eyedraw_stringField3')
+                ),
+                'AngleGradeWest'=>array(
+                  'grade'=>array('id'=>'Eyedraw_stringField4')
+                ),
+                ),
+              ));
+              </code></pre>
+              <pre><code>
+              $this->widget('application.modules.eyedraw2.OEEyeDrawWidget', array(
+                'doodleToolBarArray'=>array('PeripapillaryAtrophy', 'NerveFibreDefect', 'DiskHaemorrhage',
+                'OpticDiskPit'),
+                'scriptArray'=>array('ED_Glaucoma.js'),
+                'side'=>'R',
+                'mode'=>'edit',
+                'width'=>200,
+                'height'=>200,
+                'idSuffix'=> 'RPS',
+                'model'=>$model,
+                'attribute'=>'right_drawing',
+                'onReadyCommandArray'=>array(
+                  array('addDoodle', array('OpticDisk')),
+                  array('addDoodle', array('PeripapillaryAtrophy')),
+                  array('deselectDoodles'),
+                ),
+                'bindingArray'=>array(
+                  'OpticDisk'=>array(
+                    'mode'=>array('id'=>'Eyedraw_stringField1', 'attribute'=>'ed_val')
+                  ),
+                ),
+              ));
+            </code></pre>
+            
+            <h2 id="appendix1">Appendix 1</h2>
+
+            <h3 id="appendix-notifications">Notifications</h3>
+
+            <table class="table">
+              <tr>
+                <th>Event name</th>
+                <th>Description</th>
+                <th>Object properties</th>
+              </tr>
+              <tr>
+                <td>doodleAdded</td>
+                <td>A new doodle has been added</td>
+                <td>The newly added doodle</td>
+              </tr>
+              <tr>
+                <td>doodleDeleted</td>
+                <td>The selected doodle has been deleted</td>
+                <td>The class name of the deleted doodle</td>
+              </tr>
+              <tr>
+                <td>flipHor</td>
+                <td>The selected doodle has been flipped around a horizontal axis</td>
+                <td>Empty</td>
+              </tr>
+              <tr>
+                <td>flipVer</td>
+                <td>The selected doodle has been flipped around a vertical axis</td>
+                <td>Empty</td>
+              </tr>
+              <tr>
+                <td>hover</td>
+                <td>The mouse has been held over a doodle for the hover time</td>
+                <td>A point object containing the canvas coordinates of the pointer</td>
+              </tr>
+              <tr>
+                <td>keydown</td>
+                <td>A key has been pressed </td>
+                <td>the keycode of the pressed key</td>
+              </tr>
+              <tr>
+                <td>mousedown</td>
+                <td>The pointer has been clicked in the drawing’s canvas</td>
+                <td>A point object containing the canvas coordinates of the pointer</td>
+              </tr>
+              <tr>
+                <td>mousedragged</td>
+                <td>The pointer has been dragged within the drawing’s canvas</td>
+                <td> A point object containing the canvas coordinates of the pointer</td>
+              </tr>
+              <tr>
+                <td>mouseout</td>
+                <td>The pointer has left the drawing’s canvas</td>
+                <td>A point object containing the canvas coordinates of the pointer</td>
+              </tr>
+              <tr>
+                <td>mouseover</td>
+                <td>The pointer has entered the drawing’s canvas</td>
+                <td>A point object containing the canvas coordinates of the pointer</td>
+              </tr>
+              <tr>
+                <td>mouseup</td>
+                <td>The pointer has been unclicked </td>
+                <td>A point object containing the canvas coordinates of the pointer</td>
+              </tr>
+              <tr>
+                <td>moveToBack</td>
+                <td>The selected doodle has been moved to the back</td>
+                <td>Empty</td>
+              </tr>
+              <tr>
+                <td>moveToFront</td>
+                <td>The selected doodle has been moved to the front</td>
+                <td>Empty</td>
+              </tr>
+              <tr>
+                <td>parameterChanged</td>
+                <td>The value of a doodle’s parameter has changed</td>
+                <td>doodle:The doodle, parameter: Name of parameter, value: The new value</td>
+              </tr>
+              <tr>
+                <td>ready</td>
+                <td>All required graphics files are successfully loaded, and the drawing object is ready to accept commands</td>
+                <td>Empty</td>
+              </tr>
+            </table>
+
+            <h2 id="appendix2">Appendix 2</h2>
+            
+            <h3 id="list-of-arguments">List of arguments for the EyeDraw widget</h3>
+
+            <table class="table">
+              <tr>
+                <th>Argument</th>
+                <th>Description</th>
+                <th>Default value</th>
+              </tr>
+              <tr>
+                <td>attribute</td>
+                <td>Name of the attribute</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td>bindingArray</td>
+                <td>Array of bindings to apply to doodles, applied after onLoaded commands</td>
+                <td>Empty array</td>
+              </tr>
+              <tr>
+                <td>canvasStyle</td>
+                <td>Optional inline styling for the canvas element</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td>deleteValueArray</td>
+                <td>Array of delete values to apply to doodles, applied after bindings commands</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td>divWrapper</td>
+                <td>Whether the EyeDraw should be rendered with a div wrapper</td>
+                <td>TRUE</td>
+              </tr>
+              <tr>
+                <td>doodleToolBarArray</td>
+                <td>Array of doodles to appear in doodle selection toolbar. Can be defined as an array of arrays of doodles. Each array will then define a separate row of buttons.</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td>focus</td>
+                <td>Whether to focus the canvas element after rendering it on the page</td>
+                <td>FALSE</td>
+              </tr>
+              <tr>
+                <td>idSuffix</td>
+                <td>Unique identifier for the drawing on the current page</td>
+                <td>EDI</td>
+              </tr>
+              <tr>
+                <td>height</td>
+                <td>Height of canvas element in pixels</td>
+                <td>300</td>
+              </tr>
+              <tr>
+                <td>listenerArray</td>
+                <td>Array of javascript listener objects to provide dynamic functionality for changes in state for the EyeDraw.</td>
+                <td>Empty array</td>
+              </tr>
+              <tr>
+                <td>mode</td>
+                <td>Mode ('edit' or 'view')</td>
+                <td>edit</td>
+              </tr>
+              <tr>
+                <td>model</td>
+                <td>The model possessing an attribute to store JSON data</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td>offsetX</td>
+                <td>x offset</td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <td>offsetY</td>
+                <td>y offset</td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <td>onReadyCommandArray</td>
+                <td>Array of commands to apply to a new drawing object once drawing is ready</td>
+                <td>Empty array</td>
+              </tr>
+              <tr>
+                <td>scriptArray</td>
+                <td>Array of filenames of each sub-class definition file required</td>
+                <td>Empty array. If empty, all files will be loaded</td>
+              </tr>
+              <tr>
+                <td>side</td>
+                <td>Side (R or L)</td>
+                <td>R</td>
+              </tr>
+              <tr>
+                <td>syncArray</td>
+                <td>Array of syncs to apply to doodles, applied after bindings commands</td>
+                <td>Empty array</td>
+              </tr>
+              <tr>
+                <td>template</td>
+                <td>Name of the PHP file used as a template</td>
+                <td>OEEyeDrawWidgetBasic</td>
+              </tr>
+              <tr>
+                <td>toImage</td>
+                <td>Whether to convert the canvas to an image</td>
+                <td>FALSE</td>
+              </tr>
+              <tr>
+                <td>toolbar</td>
+                <td>Whether to show the toolbar or not</td>
+                <td>TRUE</td>
+              </tr>
+              <tr>
+                <td>width</td>
+                <td>Width of canvas element in pixels</td>
+                <td>300</td>
+              </tr>
+            </table>
+        </div>
+      </div>
+    </div>
+	</body>			
+</html>
