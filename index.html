@@ -36,6 +36,7 @@
           <h2>Table of Contents</h2>
           <ol>
             <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#newDoodle">Adding a new Doodle</a></li>
             <li><a href="#basic-usage">Basic usage</a></li>
             <li><a href="#initialisation ">Initialisation of doodle parameters</a></li>          
             <li><a href="#binding-to-html">Binding to HTML elements</a></li>          
@@ -56,8 +57,6 @@
             <li><a href="#faqs">FAQs</a></li> 
           </ol>
 
-
-
             <h2 id="introduction">Introduction</h2>
             <p>This document describes the use of EyeDraw, the OpenEyes drawing package. It describes in detail how to
             create a drawing on an HTML page using HTML elements and javascript. A companion document describes the
@@ -69,6 +68,50 @@
             <h2>Usage</h2>
             <p>For most of the sections below, a fully commented and working HTML file is provided in the with a name
             corresponding to the title of the section</p>
+
+
+            <h3 id="newDoodle"></h3>
+
+              <p>Note: If not basing the doodle on an illustration and coding the canvas commands from scratch start at step 8.</p>
+
+              <p>NEW (when using tools/svgToCanvas.html):</p>
+
+              <ul>
+                <li>Export an illustration as svg</li>
+                <li>Open tools/svgToCanvas.html in the Chrome browser</li>
+                <li>Drag the svg file into the area at the top of the page</li>
+                <li>Check the preview panel on the right to ensure the shape looks correct</li>
+                <li>Create a new doodle class named appropriately under the correct sub-specialty e.g. src/ED/Doodles/<subspecialty></li>
+                <li>Copy an existing doodle class to use as a template</li>
+                <li>Update the draw() method content with the commands from the center panel on the svgToCanvas tool</li>
+                <li>Set the correct handle parameters e.g rotation etc.</li>
+                <li>Correct the path stroke / fill / start location as necessary</li>
+                <li>Update the description method as necessary</li>
+                <li>Update the savedParameterArray property as necessary</li>
+                <li>Display doodle (with boundary path line thickness set to 16, screen grab, paste in to Graphic Converter or equivalent, and save as <doodlename>.gif</li>
+                <li>Add a new toolbar icon to assets/img/icons/32x32 - this must be named the same as the class due to the dynamic sprite generation used by compass</li>
+              </ul>
+
+              <p>OLD (when using spreadsheet):</p>
+
+              <ul>
+                <li>Export an illustration as svg</li>
+                <li>Take the generated path and replace spaces and commas with tabs</li>
+                <li>Add tabs between letters and coordinates</li>
+                <li>Break each set of coordinates e.g. M  156.71  324.633 onto a separate line </li>
+                <li>Break each curve point onto a separate line</li>
+                <li>Paste into spreadsheet(docs/Svg to Canvas.numbers) in cell A4</li>
+                <li>This will generate canvas commands to draw the shape</li>
+                <li>Create a new doodle class named appropriately under the correct sub-specialty e.g. src/ED/Doodles/<subspecialty></li>
+                <li>Copy an existing doodle class to use as a template</li>
+                <li>Update the draw() method content with the commands from the spreadsheet</li>
+                <li>Set the correct handle parameters e.g rotation etc.</li>
+                <li>Correct the path stroke / fill / start location as necessary</li>
+                <li>Update the description method as necessary</li>
+                <li>Update the savedParameterArray property as necessary</li>
+                <li>Display doodle (with boundary path line thickness set to 16, screen grab, paste in to Graphic Converter or equivalent, and save as <doodlename>.gif</li>
+                <li>Add a new toolbar icon to assets/img/icons/32x32 - this must be named the same as the class due to the dynamic sprite generation used by compass</li>
+              </ul>
             
             <h3 id="basic-usage">Basic usage</h3>
             <p>An EyeDraw instance can be created using the following code which runs on page load (see the file
