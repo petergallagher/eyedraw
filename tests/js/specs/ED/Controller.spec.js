@@ -86,18 +86,26 @@
 
 				var properties = $.extend({}, defaultProperties);
 				var controller = new ED.Controller(properties);
-				var notification = controller.drawing.notificationArray[controller.drawing.notificationArray.length - 1]
+				var notification = controller.drawing.notificationArray[controller.drawing.notificationArray.length - 2];
 
 				expect(notification.object).to.equal(controller);
 				expect(notification.methodName).to.equal('notificationHandler');
 				expect(notification.notificationList).to.have.members([
 					'ready',
 					'doodlesLoaded',
+					'parameterChanged'
+				]);
+
+				notification = controller.drawing.notificationArray[controller.drawing.notificationArray.length - 1];
+
+				expect(notification.object).to.equal(controller);
+				expect(notification.methodName).to.equal('saveDrawingToInputField');
+				expect(notification.notificationList).to.have.members([
 					'doodleAdded',
 					'doodleDeleted',
 					'doodleSelected',
 					'mousedragged',
-					'parameterChanged'
+					'drawingZoom'
 				]);
 			});
 
