@@ -228,7 +228,7 @@
 				it('should save the drawing data to the input field', function() {
 					var spy = sinon.spy(drawing, 'save');
 					drawing.notify('ready');
-					expect(spy.calledOnce).to.be.true;
+					expect(spy.calledTwice).to.be.true;
 					spy.reset();
 				});
 
