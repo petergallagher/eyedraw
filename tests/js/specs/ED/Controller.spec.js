@@ -12,7 +12,7 @@
 	var defaultProperties = {
 		canvasId: 'canvasID',
 		inputId: 'inputID',
-		graphicsPath: '../../../../../assets/img',
+		graphicsPath: '../../../../assets/img', //relative to mocha bin in node_modules/grunt-mocha/node_modules/.bin
 		offsetX: 100,
 		offsetY: 100,
 		toImage: false,
