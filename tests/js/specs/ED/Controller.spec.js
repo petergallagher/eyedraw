@@ -12,7 +12,7 @@
 	var defaultProperties = {
 		canvasId: 'canvasID',
 		inputId: 'inputID',
-		graphicsPath: '../../../../../assets/img',
+		graphicsPath: '../../../../assets/img', //relative to mocha bin in node_modules/grunt-mocha/node_modules/.bin
 		offsetX: 100,
 		offsetY: 100,
 		toImage: false,
@@ -86,18 +86,26 @@
 
 				var properties = $.extend({}, defaultProperties);
 				var controller = new ED.Controller(properties);
-				var notification = controller.drawing.notificationArray[controller.drawing.notificationArray.length - 1]
+				var notification = controller.drawing.notificationArray[controller.drawing.notificationArray.length - 2];
 
 				expect(notification.object).to.equal(controller);
 				expect(notification.methodName).to.equal('notificationHandler');
 				expect(notification.notificationList).to.have.members([
 					'ready',
 					'doodlesLoaded',
+					'parameterChanged'
+				]);
+
+				notification = controller.drawing.notificationArray[controller.drawing.notificationArray.length - 1];
+
+				expect(notification.object).to.equal(controller);
+				expect(notification.methodName).to.equal('saveDrawingToInputField');
+				expect(notification.notificationList).to.have.members([
 					'doodleAdded',
 					'doodleDeleted',
 					'doodleSelected',
 					'mousedragged',
-					'parameterChanged'
+					'drawingZoom'
 				]);
 			});
 
@@ -220,7 +228,7 @@
 				it('should save the drawing data to the input field', function() {
 					var spy = sinon.spy(drawing, 'save');
 					drawing.notify('ready');
-					expect(spy.calledOnce).to.be.true;
+					expect(spy.calledTwice).to.be.true;
 					spy.reset();
 				});
 
@@ -255,12 +263,13 @@
 			});
 
 			describe('doodleAdded event', function() {
+				/* This function no longer exists
 				it('should call the correct handler', function() {
 					var spy = sinon.spy(controller, 'onDoodleAdded');
 					drawing.notify('doodleAdded');
 					expect(spy.called).to.be.true;
 					spy.reset();
-				});
+				});*/
 				it('should save the drawing data to the input field', function() {
 					var spy = sinon.spy(controller, 'saveDrawingToInputField');
 					drawing.notify('doodleAdded');
@@ -270,12 +279,14 @@
 			});
 
 			describe('doodleDeleted event', function() {
-				it('should call the correct handler', function() {
+				/* This function no longer exists
+
+				 it('should call the correct handler', function() {
 					var spy = sinon.spy(controller, 'onDoodleDeleted');
 					drawing.notify('doodleDeleted');
 					expect(spy.called).to.be.true;
 					spy.reset();
-				});
+				});*/
 				it('should save the drawing data to the input field', function() {
 					var spy = sinon.spy(controller, 'saveDrawingToInputField');
 					drawing.notify('doodleDeleted');
@@ -285,14 +296,15 @@
 			});
 
 			describe('doodleSelected event', function() {
-				it('should call the correct handler', function() {
+				/* This function no longer exists
+				 it('should call the correct handler', function() {
 					var spy = sinon.spy(controller, 'onDoodleSelected');
 					drawing.notify('doodleSelected');
 					expect(spy.calledOnce).to.be.true;
 					spy.reset();
-				});
+				});*/
 				it('should deselect synced doodles', function() {
-					var spy = sinon.spy(controller, 'deselectSyncedDoodles');
+					var spy = sinon.spy(controller, 'saveDrawingToInputField');
 					drawing.notify('doodleSelected');
 					expect(spy.calledOnce).to.be.true;
 					spy.reset();
@@ -300,12 +312,12 @@
 			});
 
 			describe('mousedragged event', function() {
-				it('should call the correct handler', function() {
+				/*it('should call the correct handler', function() {
 					var spy = sinon.spy(controller, 'onMousedragged');
 					drawing.notify('mousedragged');
 					expect(spy.calledOnce).to.be.true;
 					spy.reset();
-				});
+				});*/
 				it('should save the drawing data to the input field', function() {
 					var spy = sinon.spy(controller, 'saveDrawingToInputField');
 					drawing.notify('doodleDeleted');
@@ -466,6 +478,7 @@
 			it('should de-select synced doodles', function() {
 
 				var options = {
+					drawingName: 'draw_1',
 					syncArray: {
 						'EYEDRAW_ID_1': {
 							Cataract: {
@@ -500,6 +513,7 @@
 				var prop2 = $.extend({}, properties, {
 					idSuffix: 'EYEDRAW_ID_2'
 				});
+				prop2.drawingName = 'draw_2';
 				var controller2 = new ED.Controller(prop2);
 				var drawing2 = controller2.drawing;
 
@@ -604,6 +618,7 @@
 
 				var options1 = {
 					idSuffix: 'EYEDRAW_ID_1',
+					drawingName: 'draw_1',
 					onReadyCommandArray: [
 						[
 							"addDoodle",
@@ -621,6 +636,7 @@
 
 				var options2 = {
 					idSuffix: 'EYEDRAW_ID_2',
+					drawingName: 'draw_2',
 					syncArray: {
 						'EYEDRAW_ID_1': {
 							Surgeon: {
@@ -629,7 +645,7 @@
 								}
 							}
 						}
-					},
+					}
 				};
 
 				var properties2 = $.extend({}, defaultProperties, options2);

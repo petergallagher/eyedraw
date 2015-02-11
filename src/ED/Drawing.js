@@ -318,7 +318,7 @@ ED.Drawing.prototype.init = function() {
 	// Start loading of texture images (will send ready notification when ready)
 	/* FIXME */
 	this.preLoadImagesFrom(this.graphicsPath + '/' + 'patterns/');
-}
+};
 
 /**
  * Replaces the canvas element inline with a PNG image, useful for printing
@@ -434,7 +434,7 @@ ED.Drawing.prototype.unRegisterForNotifications = function(_object) {
 	if (index >= 0) {
 		this.notificationArray.splice(index, 1);
 	}
-}
+};
 
 /**
  * Send notifications to all registered objects
@@ -469,7 +469,7 @@ ED.Drawing.prototype.notify = function(_eventName, _object) {
 			}
 		}
 	}
-}
+};
 
 /**
  * Loads doodles from an HTML element
@@ -1852,7 +1852,7 @@ ED.Drawing.prototype.deselectDoodles = function() {
 
 	// Refresh drawing
 	this.repaint();
-}
+};
 
 /**
  * Use scroll to select next doodle in array (From an idea of Adrian Duke)
@@ -2408,7 +2408,7 @@ ED.Drawing.prototype.numberOfDoodlesOfClass = function(_className) {
 	}
 
 	return returnValue;
-}
+};
 
 /**
  * Returns first doodle of the passed className, or false if does not exist
@@ -2428,7 +2428,7 @@ ED.Drawing.prototype.firstDoodleOfClass = function(_className) {
 	}
 
 	return returnValue;
-}
+};
 
 
 /**

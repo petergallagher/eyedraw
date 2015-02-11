@@ -7,7 +7,7 @@ module.exports = function(grunt) {
 		},
 		src: [
 			'tests/js/runners/**/*.html',
-			'!**/index.html',
+			'!**/index.html'
 		]
 	};
 };
