@@ -21,6 +21,7 @@ module.exports = function(grunt) {
 	return {
 		files : [ 'gruntfile.js', 'src/**/*.js', 'test/**/*.js' ],
 		options : {
+			reporter: require('jshint-stylish'),
 			// options here to override JSHint defaults
 			globals : {
 				jQuery : true,
